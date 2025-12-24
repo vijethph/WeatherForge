@@ -395,8 +395,8 @@ GEM
     sass-embedded (1.97.1-x86_64-linux-musl)
       google-protobuf (~> 4.31)
     securerandom (0.4.1)
-    shoulda-matchers (6.5.0)
-      activesupport (>= 5.2.0)
+    shoulda-matchers (7.0.1)
+      activesupport (>= 7.1)
     sidekiq (8.1.0)
       connection_pool (>= 3.0.0)
       json (>= 2.16.0)
@@ -498,7 +498,7 @@ DEPENDENCIES
   rubocop-rails (~> 2.34, >= 2.34.2)
   rubocop-rails-omakase
   rubocop-rspec (~> 3.8)
-  shoulda-matchers (~> 6.0)
+  shoulda-matchers (~> 7.0)
   sidekiq (~> 8.1)
   sidekiq-scheduler (~> 6.0)
   solid_cable
