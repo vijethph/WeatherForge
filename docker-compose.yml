@@ -1,0 +1,118 @@
+# Docker Compose v2 configuration for WeatherForge
+# Includes: Web, PostgreSQL, Redis, and Sidekiq worker services
+
+name: weatherforge
+
+services:
+  postgres:
+    image: postgres:17-alpine
+    container_name: weatherforge_postgres
+    environment:
+      POSTGRES_USER: weatherforge
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-weatherforge_dev_password}
+      POSTGRES_DB: weatherforge_development
+      PGDATA: /var/lib/postgresql/data/pgdata
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U weatherforge"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 10s
+    restart: unless-stopped
+    networks:
+      - weatherforge_network
+
+  redis:
+    image: redis:8.2-alpine
+    container_name: weatherforge_redis
+    command: redis-server --appendonly yes --maxmemory 256mb --maxmemory-policy allkeys-lru
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 5
+      start_period: 5s
+    restart: unless-stopped
+    networks:
+      - weatherforge_network
+
+  web:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        RUBY_VERSION: 3.4.5
+        NODE_VERSION: 22.12.0
+    container_name: weatherforge_web
+    command: bash -c "rm -f tmp/pids/server.pid && bin/rails db:prepare && bin/rails server -b 0.0.0.0"
+    environment:
+      RAILS_ENV: ${RAILS_ENV:-development}
+      DATABASE_URL: postgresql://weatherforge:${POSTGRES_PASSWORD:-weatherforge_dev_password}@postgres:5432/weatherforge_development
+      REDIS_URL: redis://redis:6379/0
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/rails
+      - bundle_cache:/usr/local/bundle
+      - node_modules:/rails/node_modules
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    restart: unless-stopped
+    networks:
+      - weatherforge_network
+    stdin_open: true
+    tty: true
+
+  sidekiq:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      args:
+        RUBY_VERSION: 3.4.5
+        NODE_VERSION: 22.12.0
+    container_name: weatherforge_sidekiq
+    command: bundle exec sidekiq -C config/sidekiq.yml
+    environment:
+      RAILS_ENV: ${RAILS_ENV:-development}
+      DATABASE_URL: postgresql://weatherforge:${POSTGRES_PASSWORD:-weatherforge_dev_password}@postgres:5432/weatherforge_development
+      REDIS_URL: redis://redis:6379/0
+      RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+    volumes:
+      - .:/rails
+      - bundle_cache:/usr/local/bundle
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      web:
+        condition: service_started
+    restart: unless-stopped
+    networks:
+      - weatherforge_network
+
+volumes:
+  postgres_data:
+    driver: local
+  redis_data:
+    driver: local
+  bundle_cache:
+    driver: local
+  node_modules:
+    driver: local
+
+networks:
+  weatherforge_network:
+    driver: bridge

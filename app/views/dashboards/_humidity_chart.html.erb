@@ -1,0 +1,52 @@
+<% chart_data = {}
+   locations.each do |location|
+     data_points = location.weather_metrics_24h.order(:recorded_at).map do |metric|
+       [metric.recorded_at.strftime('%H:%M'), metric.humidity.to_f]
+     end.to_h
+     chart_data[location.name] = data_points unless data_points.empty?
+   end
+%>
+
+<% if chart_data.present? && chart_data.values.any?(&:any?) %>
+  <%= line_chart chart_data,
+      library: {
+        responsive: true,
+        maintainAspectRatio: false,
+        interaction: {
+          mode: 'index',
+          intersect: false
+        },
+        plugins: {
+          legend: {
+            display: true,
+            position: 'bottom'
+          },
+          tooltip: {
+            enabled: true
+          }
+        },
+        scales: {
+          y: {
+            max: 100,
+            min: 0,
+            title: {
+              display: true,
+              text: 'Humidity (%)'
+            }
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Time'
+            }
+          }
+        }
+      },
+      height: '300px',
+      download: false
+  %>
+<% else %>
+  <div class="alert alert-info mb-0">
+    <i class="bi bi-info-circle"></i> No humidity data available yet. Click "Refresh Now" to fetch weather data.
+  </div>
+<% end %>

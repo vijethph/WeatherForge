@@ -1,0 +1,16 @@
+---
+:verbose: false
+:timeout: 30
+:concurrency: 5
+:max_retries: 5
+
+:queues:
+  - default
+  - [critical, 2]
+
+:schedule:
+  sync_weather_job:
+    cron: "*/5 * * * *"
+    class: SyncWeatherJob
+    queue: default
+    description: "Sync weather data every 5 minutes"
