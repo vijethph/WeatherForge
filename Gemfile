@@ -80,5 +80,5 @@ gem "dotenv-rails", "~> 3.2"
 gem "rspec-rails", "~> 8.0", ">= 8.0.2", group: [ :development, :test ]
 gem "factory_bot_rails", "~> 6.5", ">= 6.5.1", group: [ :development, :test ]
 gem "faker", "~> 3.5", ">= 3.5.3", group: [ :development, :test ]
-gem "shoulda-matchers", "~> 6.0", group: :test
+gem "shoulda-matchers", "~> 7.0", group: :test
 gem "kaminari", "~> 1.2", ">= 1.2.2"
