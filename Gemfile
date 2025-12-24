@@ -82,4 +82,3 @@ gem "factory_bot_rails", "~> 6.5", ">= 6.5.1", group: [ :development, :test ]
 gem "faker", "~> 3.5", ">= 3.5.3", group: [ :development, :test ]
 gem "shoulda-matchers", "~> 7.0", group: :test
 gem "kaminari", "~> 1.2", ">= 1.2.2"
-

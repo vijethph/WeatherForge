@@ -1,48 +1,55 @@
 <% chart_data = {}
    locations.each do |location|
-     data_points = location.weather_metrics_24h.order(:recorded_at).map do |metric|
-       [metric.recorded_at.strftime('%H:%M'), metric.wind_speed.to_f]
-     end.to_h
-     chart_data[location.name] = data_points unless data_points.empty?
+     metrics = location.weather_metrics_24h.order(:recorded_at)
+     if metrics.any?
+       data_points = metrics.map do |metric|
+         [metric.recorded_at.to_time, metric.wind_speed.to_f]
+       end
+       chart_data[location.name] = data_points
+     end
    end
 %>
 
 <% if chart_data.present? && chart_data.values.any?(&:any?) %>
   <%= line_chart chart_data,
+      xtitle: 'Time',
+      ytitle: 'Wind Speed (km/h)',
+      min: 0,
+      curve: true,
+      points: true,
+      download: false,
       library: {
         responsive: true,
         maintainAspectRatio: false,
-        interaction: {
-          mode: 'index',
-          intersect: false
-        },
-        plugins: {
-          legend: {
-            display: true,
-            position: 'bottom'
-          },
-          tooltip: {
-            enabled: true
-          }
-        },
         scales: {
+          x: {
+            type: 'time',
+            time: {
+              unit: 'hour',
+              displayFormats: {
+                hour: 'HH:mm'
+              }
+            },
+            title: {
+              display: true,
+              text: 'Time'
+            }
+          },
           y: {
             beginAtZero: true,
             title: {
               display: true,
               text: 'Wind Speed (km/h)'
             }
-          },
-          x: {
-            title: {
-              display: true,
-              text: 'Time'
-            }
+          }
+        },
+        plugins: {
+          legend: {
+            display: true,
+            position: 'bottom'
           }
         }
-      },
-      height: '300px',
-      download: false
+      }
   %>
 <% else %>
   <div class="alert alert-info mb-0">

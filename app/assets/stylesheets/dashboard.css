@@ -20,63 +20,43 @@
   --card-green-end: #059669;
 }
 
+/* Ensure turbo-frame doesn't interfere with Bootstrap grid */
+turbo-frame {
+  display: contents;
+}
+
 /* Weather Card Styling */
-.weather-card {
-  transition: transform 0.2s, box-shadow 0.2s;
+.card {
   border: none;
   border-radius: 12px;
-  overflow: hidden;
+  transition: transform 0.2s, box-shadow 0.2s;
 }
 
-.weather-card:hover {
+.card:hover {
   transform: translateY(-4px);
-  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
 }
 
-.weather-card .card-header {
+.card .card-header {
   background: linear-gradient(
     135deg,
     var(--card-purple-start) 0%,
     var(--card-purple-end) 100%
   );
-  color: white;
   border: none;
-  padding: 1.25rem;
+  border-radius: 12px 12px 0 0 !important;
+  padding: 1rem 1.25rem;
 }
 
-.weather-card .card-header h5 {
+.card .card-title {
   font-size: 1.25rem;
   font-weight: 600;
-  margin: 0;
-}
-
-.weather-card .card-header small {
-  opacity: 0.9;
-  font-size: 0.85rem;
-}
-
-/* Metric Box Styling */
-.metric-box {
-  text-align: center;
-  padding: 1rem;
-  background: var(--light-bg);
-  border-radius: 8px;
-  margin-bottom: 0.5rem;
-}
-
-.metric-value {
-  font-size: 1.75rem;
-  font-weight: 700;
-  color: var(--dark-text);
   margin-bottom: 0.25rem;
 }
 
-.metric-label {
+.card .card-header small {
+  opacity: 0.95;
   font-size: 0.875rem;
-  color: var(--muted-text);
-  text-transform: uppercase;
-  font-weight: 500;
-  letter-spacing: 0.5px;
 }
 
 /* Chart Card Styling */
@@ -96,6 +76,8 @@
 .chart-card .card-body {
   min-height: 350px;
   padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
 }
 
 .chart-card .card-body > div {

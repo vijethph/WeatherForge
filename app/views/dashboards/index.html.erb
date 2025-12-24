@@ -29,7 +29,7 @@
   <% else %>
     <div class="row g-4 mb-4">
       <% @locations.each do |location| %>
-        <div class="col-lg-4 col-md-6 col-sm-12">
+        <div class="col-lg-4 col-md-6 col-12">
           <%= turbo_frame_tag "weather_card_#{location.id}" do %>
             <%= render 'dashboards/weather_card', location: location %>
           <% end %>

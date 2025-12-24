@@ -165,4 +165,3 @@ jobs:
           build-args: |
             RUBY_VERSION=3.4.5
             NODE_VERSION=22.12.0
-
