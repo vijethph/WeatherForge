@@ -60,6 +60,22 @@ RSpec/AnyInstance:
 RSpec/VerifiedDoubles:
   Enabled: false
 
+RSpec/EmptyExampleGroup:
+  Exclude:
+    - "spec/requests/**/*"
+
+RSpec/LetSetup:
+  Exclude:
+    - "spec/requests/**/*"
+
+RSpec/VariableName:
+  Exclude:
+    - "spec/requests/**/*"
+
+RSpec/MultipleMemoizedHelpers:
+  Exclude:
+    - "spec/requests/**/*"
+
 # Metrics
 Metrics/BlockLength:
   Exclude:

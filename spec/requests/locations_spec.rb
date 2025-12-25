@@ -26,36 +26,19 @@ RSpec.describe 'Locations API', type: :request do
       produces 'text/html'
       description 'Creates a new weather location and triggers elevation fetch and weather sync'
 
-      parameter name: :location, in: :body, schema: {
-        type: :object,
-        properties: {
-          location: {
-            type: :object,
-            properties: {
-              name: { type: :string, example: 'New York' },
-              latitude: { type: :number, format: :float, example: 40.7128 },
-              longitude: { type: :number, format: :float, example: -74.0060 },
-              timezone: { type: :string, example: 'America/New_York' },
-              country: { type: :string, example: 'US' },
-              description: { type: :string, example: 'The Big Apple', nullable: true }
-            },
-            required: [ 'name', 'latitude', 'longitude' ]
-          }
-        }
-      }
+      parameter name: 'location[name]', in: :formData, type: :string, description: 'Location name', example: 'New York'
+      parameter name: 'location[latitude]', in: :formData, type: :number, format: :float, description: 'Latitude', example: 40.7128, required: true
+      parameter name: 'location[longitude]', in: :formData, type: :number, format: :float, description: 'Longitude', example: -74.0060, required: true
+      parameter name: 'location[timezone]', in: :formData, type: :string, description: 'Timezone', example: 'America/New_York'
+      parameter name: 'location[country]', in: :formData, type: :string, description: 'Country code', example: 'US'
+      parameter name: 'location[description]', in: :formData, type: :string, description: 'Description', example: 'The Big Apple', required: false
 
       response '302', 'location created successfully' do
-        let(:location) do
-          {
-            location: {
-              name: 'New York',
-              latitude: 40.7128,
-              longitude: -74.0060,
-              timezone: 'America/New_York',
-              country: 'US'
-            }
-          }
-        end
+        let(:'location[name]') { 'New York' }
+        let(:'location[latitude]') { 40.7128 }
+        let(:'location[longitude]') { -74.0060 }
+        let(:'location[timezone]') { 'America/New_York' }
+        let(:'location[country]') { 'US' }
 
         before do
           allow_any_instance_of(WeatherService).to receive(:fetch_elevation).and_return(10.0)
@@ -69,7 +52,11 @@ RSpec.describe 'Locations API', type: :request do
       end
 
       response '422', 'invalid request' do
-        let(:location) { { location: { name: '' } } }
+        let(:'location[name]') { '' }
+        let(:'location[latitude]') { nil }
+        let(:'location[longitude]') { nil }
+        let(:'location[timezone]') { nil }
+        let(:'location[country]') { nil }
 
         run_test! do |response|
           expect(response).to have_http_status(:unprocessable_entity)
