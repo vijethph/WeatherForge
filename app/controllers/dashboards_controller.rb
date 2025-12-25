@@ -39,6 +39,7 @@ class DashboardsController < ApplicationController
       Location.create!(loc_attrs)
     end
 
-    SyncWeatherJob.perform_now
+    # Skip weather sync in test environment to avoid external API calls
+    SyncWeatherJob.perform_now unless Rails.env.test?
   end
 end
