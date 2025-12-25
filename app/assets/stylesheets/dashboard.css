@@ -125,6 +125,21 @@ turbo-frame {
   font-weight: 500;
 }
 
+/* Fix button_to form display to prevent block layout */
+form.d-inline {
+  display: inline-block !important;
+  margin: 0;
+}
+
+/* Ensure gap utility works for button container */
+.gap-2 {
+  gap: 0.5rem !important;
+}
+
+.d-flex.align-items-center {
+  align-items: center !important;
+}
+
 /* Alert Styling */
 .alert {
   border-radius: 10px;
@@ -170,6 +185,28 @@ turbo-frame {
 .form-control:focus,
 .form-select:focus {
   box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
+}
+
+/* Chart location selector styling */
+.form-label.fw-bold {
+  color: var(--dark-text);
+  font-size: 0.95rem;
+}
+
+.form-select {
+  border-radius: 8px;
+  border: 1px solid #dee2e6;
+  padding: 0.5rem 1rem;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.form-select:hover {
+  border-color: #0056b3;
+}
+
+.chart-wrapper {
+  min-height: 300px;
+  transition: opacity 0.3s ease;
 }
 
 /* Empty State */

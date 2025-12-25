@@ -1,12 +1,9 @@
 Rails.application.routes.draw do
+  mount Rswag::Ui::Engine => '/api-docs'
+  mount Rswag::Api::Engine => '/api-docs'
   # Mount Sidekiq Web UI for monitoring background jobs
   require "sidekiq/web"
   mount Sidekiq::Web => "/sidekiq"
-
-  get "locations/index"
-  get "locations/create"
-  get "locations/destroy"
-  get "dashboards/index"
 
   # Define your application routes per the DSL in https://guides.rubyonrails.org/routing.html
 
@@ -22,8 +19,18 @@ Rails.application.routes.draw do
   # root "posts#index"
   root "dashboards#index"
 
-  resources :dashboards, only: [ :index ]
-  resources :locations, only: [ :index, :create, :destroy ]
+  resources :dashboards, only: [ :index ] do
+    collection do
+      post :sync_weather
+      get :trends
+      get :forecasts
+      get :environment
+    end
+  end
 
-  post "sync-weather", to: "dashboards#sync_weather", as: "sync_weather"
+  resources :locations, only: [ :index, :create, :destroy ] do
+    collection do
+      get :search
+    end
+  end
 end

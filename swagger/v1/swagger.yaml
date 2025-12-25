@@ -1,0 +1,360 @@
+---
+openapi: 3.0.1
+info:
+  title: WeatherForge API
+  version: v1
+  description:
+    Real-time weather dashboard API with support for current weather, forecasts,
+    historical data, marine conditions, air quality, and flood risk information. Powered
+    by Open Meteo APIs.
+  contact:
+    name: WeatherForge
+    url: https://github.com/vijethph/WeatherForge
+  license:
+    name: Apache 2.0
+    url: https://opensource.org/license/apache-2-0
+paths:
+  "/dashboards":
+    get:
+      summary: Retrieve main dashboard
+      tags:
+        - Dashboards
+      description: Returns the main weather dashboard with all location weather cards
+      responses:
+        "200":
+          description: successful
+          content:
+            text/html:
+              schema:
+                type: string
+                format: html
+  "/dashboards/trends":
+    get:
+      summary: Retrieve weather trends
+      tags:
+        - Dashboards
+      description:
+        Returns 24-hour weather trends including temperature, humidity,
+        and wind speed charts
+      responses:
+        "200":
+          description: successful
+          content:
+            text/html:
+              schema:
+                type: string
+                format: html
+  "/dashboards/forecasts":
+    get:
+      summary: Retrieve weather forecasts
+      tags:
+        - Dashboards
+      description:
+        Returns weather forecast data including 24-hour forecast and 10-day
+        historical weather
+      responses:
+        "200":
+          description: successful
+          content:
+            text/html:
+              schema:
+                type: string
+                format: html
+  "/dashboards/environment":
+    get:
+      summary: Retrieve environmental data
+      tags:
+        - Dashboards
+      description:
+        Returns environmental data including marine weather, air quality,
+        and flood risk information
+      responses:
+        "200":
+          description: successful
+          content:
+            text/html:
+              schema:
+                type: string
+                format: html
+  "/dashboards/sync_weather":
+    post:
+      summary: Trigger weather data sync
+      tags:
+        - Dashboards
+      description:
+        Manually triggers a weather data synchronization for all locations
+        via Sidekiq background job
+      responses:
+        "302":
+          description: redirect after sync
+          content:
+            text/html:
+              schema:
+                type: string
+  "/locations":
+    get:
+      summary: List all locations
+      tags:
+        - Locations
+      description:
+        Returns a list of all weather locations with search and add location
+        forms
+      responses:
+        "200":
+          description: successful
+          content:
+            text/html:
+              schema:
+                type: string
+                format: html
+    post:
+      summary: Create a new location
+      tags:
+        - Locations
+      description:
+        Creates a new weather location and triggers elevation fetch and
+        weather sync
+      parameters: []
+      responses:
+        "302":
+          description: location created successfully
+        "422":
+          description: invalid request
+      requestBody:
+        content:
+          application/x-www-form-urlencoded:
+            schema:
+              type: object
+              properties:
+                location:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: New York
+                    latitude:
+                      type: number
+                      format: float
+                      example: 40.7128
+                    longitude:
+                      type: number
+                      format: float
+                      example: -74.006
+                    timezone:
+                      type: string
+                      example: America/New_York
+                    country:
+                      type: string
+                      example: US
+                    description:
+                      type: string
+                      example: The Big Apple
+                      nullable: true
+                  required:
+                    - name
+                    - latitude
+                    - longitude
+  "/locations/search":
+    get:
+      summary: Search for locations using geocoding
+      tags:
+        - Locations
+      description:
+        Search for locations using Open Meteo Geocoding API. Requires minimum
+        3 characters.
+      parameters:
+        - name: query
+          in: query
+          required: true
+          description: Search query (minimum 3 characters)
+          example: London
+          schema:
+            type: string
+      responses:
+        "200":
+          description: query too short
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          example: London
+                        latitude:
+                          type: number
+                          format: float
+                          example: 51.5074
+                        longitude:
+                          type: number
+                          format: float
+                          example: -0.1278
+                        country:
+                          type: string
+                          example: GB
+                        timezone:
+                          type: string
+                          example: Europe/London
+            text/html:
+              schema:
+                type: object
+                properties:
+                  results:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        name:
+                          type: string
+                          example: London
+                        latitude:
+                          type: number
+                          format: float
+                          example: 51.5074
+                        longitude:
+                          type: number
+                          format: float
+                          example: -0.1278
+                        country:
+                          type: string
+                          example: GB
+                        timezone:
+                          type: string
+                          example: Europe/London
+  "/locations/{id}":
+    delete:
+      summary: Delete a location
+      tags:
+        - Locations
+      description: Deletes a weather location and all associated weather data
+      parameters:
+        - name: id
+          in: path
+          required: true
+          description: Location ID
+          example: 1
+          schema:
+            type: integer
+      responses:
+        "302":
+          description: location deleted successfully
+        "404":
+          description: location not found
+servers:
+  - url: http://localhost:3000
+    description: Development server
+  - url: https://{defaultHost}
+    description: Production server
+    variables:
+      defaultHost:
+        default: weatherforge.onrender.com
+components:
+  schemas:
+    Location:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        name:
+          type: string
+          example: San Francisco
+        latitude:
+          type: number
+          format: float
+          example: 37.7749
+        longitude:
+          type: number
+          format: float
+          example: -122.4194
+        timezone:
+          type: string
+          example: America/Los_Angeles
+        country:
+          type: string
+          example: US
+        description:
+          type: string
+          example: Tech hub
+          nullable: true
+        elevation:
+          type: number
+          format: float
+          example: 52.0
+          nullable: true
+        created_at:
+          type: string
+          format: date-time
+        updated_at:
+          type: string
+          format: date-time
+      required:
+        - name
+        - latitude
+        - longitude
+    WeatherMetric:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        location_id:
+          type: integer
+          example: 1
+        temperature:
+          type: number
+          format: float
+          example: 20.5
+        feels_like:
+          type: number
+          format: float
+          example: 19.8
+        humidity:
+          type: integer
+          example: 65
+        wind_speed:
+          type: number
+          format: float
+          example: 12.5
+        wind_direction:
+          type: integer
+          example: 180
+        wind_gust:
+          type: number
+          format: float
+          example: 20.0
+        precipitation:
+          type: number
+          format: float
+          example: 0.0
+        weather_code:
+          type: integer
+          example: 1
+        cloud_cover:
+          type: integer
+          example: 25
+        pressure:
+          type: number
+          format: float
+          example: 1013.25
+        visibility:
+          type: number
+          format: float
+          example: 10000.0
+        recorded_at:
+          type: string
+          format: date-time
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+          example: Resource not found
+        message:
+          type: string
+          example: The requested resource could not be found

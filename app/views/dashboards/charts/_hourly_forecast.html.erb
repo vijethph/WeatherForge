@@ -1,0 +1,82 @@
+<% if locations.empty? %>
+  <div class="alert alert-info mb-0">
+    <i class="bi bi-info-circle"></i> No locations available. Add a location to see forecast data.
+  </div>
+<% else %>
+  <% first_location = locations.first %>
+  <div class="mb-3">
+    <label for="hourly-location-select" class="form-label fw-bold">Select Location:</label>
+    <select class="form-select" id="hourly-location-select" onchange="updateHourlyChart()">
+      <% locations.each do |location| %>
+        <option value="<%= location.id %>" <%= 'selected' if location == first_location %>>
+          <%= location.name %><% if location.country.present? %>, <%= location.country %><% end %>
+        </option>
+      <% end %>
+    </select>
+  </div>
+
+  <div id="hourly-chart-container">
+    <% locations.each_with_index do |location, index| %>
+      <% forecasts = location.hourly_forecasts.where("forecast_time > ? AND forecast_time < ?", Time.current, 24.hours.from_now).order(:forecast_time).limit(24) %>
+      <div id="hourly-chart-<%= location.id %>" class="chart-wrapper" style="<%= 'display: none;' unless index == 0 %>">
+        <% if forecasts.any? %>
+          <% chart_data = forecasts.map { |f| [f.forecast_time.strftime('%H:%M'), f.temperature.to_f] }.to_h %>
+          <%= line_chart({ location.name => chart_data },
+              xtitle: 'Time (24h)',
+              ytitle: 'Temperature (°C)',
+              points: true,
+              download: true,
+              library: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    display: false
+                  },
+                  title: {
+                    display: true,
+                    text: "24-Hour Forecast for #{location.name}"
+                  }
+                },
+                scales: {
+                  y: {
+                    title: {
+                      display: true,
+                      text: 'Temperature (°C)'
+                    }
+                  },
+                  x: {
+                    title: {
+                      display: true,
+                      text: 'Time'
+                    }
+                  }
+                }
+              }
+          ) %>
+        <% else %>
+          <div class="alert alert-warning mb-0">
+            <i class="bi bi-exclamation-triangle"></i> No forecast data available for <%= location.name %>.
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <script>
+    function updateHourlyChart() {
+      const select = document.getElementById('hourly-location-select');
+      const locationId = select.value;
+      const charts = document.querySelectorAll('[id^="hourly-chart-"]');
+
+      charts.forEach(chart => {
+        chart.style.display = 'none';
+      });
+
+      const selectedChart = document.getElementById(`hourly-chart-${locationId}`);
+      if (selectedChart) {
+        selectedChart.style.display = 'block';
+      }
+    }
+  </script>
+<% end %>

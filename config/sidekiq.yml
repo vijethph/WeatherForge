@@ -1,6 +1,6 @@
 ---
 :verbose: false
-:timeout: 30
+:timeout: 60
 :concurrency: 5
 :max_retries: 5
 
@@ -13,4 +13,4 @@
     cron: "*/5 * * * *"
     class: SyncWeatherJob
     queue: default
-    description: "Sync weather data every 5 minutes"
+    description: "Sync all weather data from 7 Open Meteo APIs every 5 minutes"

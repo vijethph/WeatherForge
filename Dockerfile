@@ -62,7 +62,12 @@ COPY . .
 RUN bundle exec bootsnap precompile -j 1 app/ lib/
 
 # Precompiling assets for production without requiring secret RAILS_MASTER_KEY
-RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
+# Set dummy database config to avoid errors when database.yml is parsed
+RUN SECRET_KEY_BASE_DUMMY=1 \
+    DB_PASSWORD="" \
+    DB_HOST=localhost \
+    DB_NAME=dummy \
+    ./bin/rails assets:precompile
 
 
 RUN rm -rf node_modules

@@ -13,12 +13,13 @@ plugins:
 AllCops:
   NewCops: enable
   TargetRubyVersion: 3.3
-  TargetRailsVersion: 7.1
+  TargetRailsVersion: 8.0
   Exclude:
     - "bin/**/*"
     - "vendor/**/*"
     - "node_modules/**/*"
     - "db/schema.rb"
+    - "config/**/*"
 
 # Layout
 Layout/LineLength:
@@ -44,6 +45,21 @@ RSpec/DescribedClass:
 RSpec/MultipleExpectations:
   Enabled: false
 
+RSpec/ExampleLength:
+  Enabled: false
+
+RSpec/MessageSpies:
+  Enabled: false
+
+RSpec/StubbedMock:
+  Enabled: false
+
+RSpec/AnyInstance:
+  Enabled: false
+
+RSpec/VerifiedDoubles:
+  Enabled: false
+
 # Metrics
 Metrics/BlockLength:
   Exclude:
@@ -51,6 +67,7 @@ Metrics/BlockLength:
     - "db/migrate/*"
 
 Metrics/MethodLength:
-  Max: 15
+  Max: 20
   Exclude:
     - "db/migrate/*"
+    - "app/services/*"

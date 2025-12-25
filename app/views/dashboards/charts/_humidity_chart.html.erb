@@ -1,10 +1,10 @@
 <% chart_data = {}
    locations.each do |location|
-     metrics = location.weather_metrics_24h.order(:recorded_at)
+     metrics = location.weather_metrics.where("recorded_at > ?", 24.hours.ago).order(:recorded_at)
      if metrics.any?
        data_points = metrics.map do |metric|
-         [metric.recorded_at.to_time, metric.humidity.to_f]
-       end
+         [metric.recorded_at.strftime('%H:%M'), metric.humidity.to_i]
+       end.to_h
        chart_data[location.name] = data_points
      end
    end
@@ -16,26 +16,18 @@
       ytitle: 'Humidity (%)',
       min: 0,
       max: 100,
-      curve: true,
       points: true,
-      download: false,
+      download: true,
       library: {
         responsive: true,
         maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            display: true,
+            position: 'bottom'
+          }
+        },
         scales: {
-          x: {
-            type: 'time',
-            time: {
-              unit: 'hour',
-              displayFormats: {
-                hour: 'HH:mm'
-              }
-            },
-            title: {
-              display: true,
-              text: 'Time'
-            }
-          },
           y: {
             min: 0,
             max: 100,
@@ -43,12 +35,12 @@
               display: true,
               text: 'Humidity (%)'
             }
-          }
-        },
-        plugins: {
-          legend: {
-            display: true,
-            position: 'bottom'
+          },
+          x: {
+            title: {
+              display: true,
+              text: 'Time'
+            }
           }
         }
       }

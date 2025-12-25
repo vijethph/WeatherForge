@@ -3,7 +3,7 @@
      metrics = location.weather_metrics_24h.order(:recorded_at)
      if metrics.any?
        data_points = metrics.map do |metric|
-         [metric.recorded_at.to_time, metric.wind_speed.to_f]
+         [metric.recorded_at.to_time, metric.temperature.to_f]
        end
        chart_data[location.name] = data_points
      end
@@ -13,14 +13,15 @@
 <% if chart_data.present? && chart_data.values.any?(&:any?) %>
   <%= line_chart chart_data,
       xtitle: 'Time',
-      ytitle: 'Wind Speed (km/h)',
-      min: 0,
+      ytitle: 'Temperature (°C)',
       curve: true,
       points: true,
       download: false,
+      dataset: { borderDash: [] },
       library: {
         responsive: true,
         maintainAspectRatio: false,
+        animation: false,
         scales: {
           x: {
             type: 'time',
@@ -36,10 +37,9 @@
             }
           },
           y: {
-            beginAtZero: true,
             title: {
               display: true,
-              text: 'Wind Speed (km/h)'
+              text: 'Temperature (°C)'
             }
           }
         },
@@ -53,6 +53,6 @@
   %>
 <% else %>
   <div class="alert alert-info mb-0">
-    <i class="bi bi-info-circle"></i> No wind speed data available yet. Click "Refresh Now" to fetch weather data.
+    <i class="bi bi-info-circle"></i> No temperature data available yet. Click "Refresh Now" to fetch weather data.
   </div>
 <% end %>

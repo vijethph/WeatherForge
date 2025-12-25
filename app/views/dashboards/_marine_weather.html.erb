@@ -1,0 +1,34 @@
+<% if locations.any? %>
+  <div class="row">
+    <% locations.each do |location| %>
+      <% marine = location.latest_marine_weather %>
+      <% if marine.present? %>
+        <div class="col-md-6 mb-3">
+          <div class="card">
+            <div class="card-body">
+              <h6><%= location.name %></h6>
+              <div class="row">
+                <div class="col-6">
+                  <small class="text-muted">Wave Height</small>
+                  <div class="h5"><%= marine.wave_height&.round(2) || "N/A" %> m</div>
+                </div>
+                <div class="col-6">
+                  <small class="text-muted">Wave Period</small>
+                  <div class="h5"><%= marine.wave_period&.round(2) || "N/A" %> s</div>
+                </div>
+              </div>
+              <% if marine.water_temperature.present? %>
+                <div class="mt-2">
+                  <small class="text-muted">Water Temperature</small>
+                  <div class="h5"><%= marine.water_temperature.round(1) %>°C</div>
+                </div>
+              <% end %>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+<% else %>
+  <div class="alert alert-info">No marine weather data available yet</div>
+<% end %>

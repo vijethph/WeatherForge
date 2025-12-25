@@ -106,6 +106,10 @@ jobs:
       RAILS_ENV: test
       DATABASE_URL: postgresql://weatherforge:postgres@localhost:5432/weatherforge_test
       REDIS_URL: redis://localhost:6379/0
+      # Provide empty values for production database config to prevent errors during db:create
+      DB_PASSWORD: ""
+      DB_HOST: localhost
+      DB_NAME: weatherforge_test
 
     steps:
       - name: Checkout code

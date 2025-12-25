@@ -1,0 +1,82 @@
+<% if locations.empty? %>
+  <div class="alert alert-info mb-0">
+    <i class="bi bi-info-circle"></i> No locations available. Add a location to see historical data.
+  </div>
+<% else %>
+  <% first_location = locations.first %>
+  <div class="mb-3">
+    <label for="historical-location-select" class="form-label fw-bold">Select Location:</label>
+    <select class="form-select" id="historical-location-select" onchange="updateHistoricalChart()">
+      <% locations.each do |location| %>
+        <option value="<%= location.id %>" <%= 'selected' if location == first_location %>>
+          <%= location.name %><% if location.country.present? %>, <%= location.country %><% end %>
+        </option>
+      <% end %>
+    </select>
+  </div>
+
+  <div id="historical-chart-container">
+    <% locations.each_with_index do |location, index| %>
+      <% history = location.historical_weathers.where("weather_date > ?", 10.days.ago).order(:weather_date) %>
+      <div id="historical-chart-<%= location.id %>" class="chart-wrapper" style="<%= 'display: none;' unless index == 0 %>">
+        <% if history.any? %>
+          <% chart_data = history.map { |h| [h.weather_date.strftime('%b %d'), h.avg_temperature.to_f] }.to_h %>
+          <%= line_chart({ location.name => chart_data },
+              xtitle: 'Date',
+              ytitle: 'Avg Temperature (°C)',
+              points: true,
+              download: true,
+              library: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                  legend: {
+                    display: false
+                  },
+                  title: {
+                    display: true,
+                    text: "10-Day Historical Weather for #{location.name}"
+                  }
+                },
+                scales: {
+                  y: {
+                    title: {
+                      display: true,
+                      text: 'Avg Temperature (°C)'
+                    }
+                  },
+                  x: {
+                    title: {
+                      display: true,
+                      text: 'Date'
+                    }
+                  }
+                }
+              }
+          ) %>
+        <% else %>
+          <div class="alert alert-warning mb-0">
+            <i class="bi bi-exclamation-triangle"></i> No historical data available for <%= location.name %>.
+          </div>
+        <% end %>
+      </div>
+    <% end %>
+  </div>
+
+  <script>
+    function updateHistoricalChart() {
+      const select = document.getElementById('historical-location-select');
+      const locationId = select.value;
+      const charts = document.querySelectorAll('[id^="historical-chart-"]');
+
+      charts.forEach(chart => {
+        chart.style.display = 'none';
+      });
+
+      const selectedChart = document.getElementById(`historical-chart-${locationId}`);
+      if (selectedChart) {
+        selectedChart.style.display = 'block';
+      }
+    }
+  </script>
+<% end %>

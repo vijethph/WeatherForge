@@ -14,6 +14,21 @@
           <% end %>
         </li>
         <li class="nav-item">
+          <%= link_to trends_dashboards_path, class: "nav-link #{current_page?(trends_dashboards_path) ? 'active' : ''}" do %>
+            <i class="bi bi-graph-up"></i> Trends
+          <% end %>
+        </li>
+        <li class="nav-item">
+          <%= link_to forecasts_dashboards_path, class: "nav-link #{current_page?(forecasts_dashboards_path) ? 'active' : ''}" do %>
+            <i class="bi bi-clock"></i> Forecasts
+          <% end %>
+        </li>
+        <li class="nav-item">
+          <%= link_to environment_dashboards_path, class: "nav-link #{current_page?(environment_dashboards_path) ? 'active' : ''}" do %>
+            <i class="bi bi-water"></i> Environment
+          <% end %>
+        </li>
+        <li class="nav-item">
           <%= link_to locations_path, class: "nav-link #{current_page?(locations_path) ? 'active' : ''}" do %>
             <i class="bi bi-geo-alt"></i> Locations
           <% end %>
