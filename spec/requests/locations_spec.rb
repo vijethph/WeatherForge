@@ -3,6 +3,8 @@
 require 'swagger_helper'
 
 RSpec.describe 'Locations API', type: :request do
+  let!(:existing_location) { create(:location) }
+
   path '/locations' do
     get 'List all locations' do
       tags 'Locations'
@@ -53,6 +55,11 @@ RSpec.describe 'Locations API', type: :request do
               country: 'US'
             }
           }
+        end
+
+        before do
+          allow_any_instance_of(WeatherService).to receive(:fetch_elevation).and_return(10.0)
+          allow(SyncWeatherJob).to receive(:perform_later)
         end
 
         run_test! do |response|

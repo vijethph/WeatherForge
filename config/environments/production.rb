@@ -7,7 +7,8 @@ Rails.application.configure do
   config.enable_reloading = false
 
   # Eager load code on boot for better performance and memory savings (ignored by Rake tasks).
-  config.eager_load = true
+  # Disable eager loading during asset precompilation to avoid initializing services
+  config.eager_load = ENV['SKIP_REDIS'] != 'true'
 
   # Full error reports are disabled.
   config.consider_all_requests_local = false
@@ -47,10 +48,12 @@ Rails.application.configure do
   config.active_support.report_deprecations = false
 
   # Replace the default in-process memory cache store with a durable alternative.
-  config.cache_store = :solid_cache_store
+  # Use memory_store during asset precompilation to avoid database connections
+  config.cache_store = ENV['SKIP_REDIS'] == 'true' ? :memory_store : :solid_cache_store
 
   # Replace the default in-process and non-durable queuing backend for Active Job.
-  config.active_job.queue_adapter = :sidekiq
+  # Use inline adapter during asset precompilation to avoid Sidekiq initialization
+  config.active_job.queue_adapter = ENV['SKIP_REDIS'] == 'true' ? :inline : :sidekiq
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).
@@ -61,6 +64,9 @@ Rails.application.configure do
 
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [ :id ]
+
+  # Skip ActionCable during asset precompilation to avoid database connections
+  config.action_cable.mount_path = nil if ENV['SKIP_REDIS'] == 'true'
 
   # Enable DNS rebinding protection and other `Host` header attacks.
   # config.hosts = [

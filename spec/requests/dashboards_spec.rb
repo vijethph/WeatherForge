@@ -3,6 +3,9 @@
 require 'swagger_helper'
 
 RSpec.describe 'Dashboards API', type: :request do
+  let!(:location) { create(:location) }
+  let!(:weather_metric) { create(:weather_metric, location: location) }
+
   path '/dashboards' do
     get 'Retrieve main dashboard' do
       tags 'Dashboards'

@@ -92,7 +92,7 @@ GEM
       msgpack (~> 1.2)
     bootstrap (5.3.5)
       popper_js (>= 2.11.8, < 3)
-    brakeman (7.1.1)
+    brakeman (7.1.2)
       racc
     builder (3.3.0)
     bundler-audit (0.9.3)
@@ -494,7 +494,7 @@ DEPENDENCIES
   binding_of_caller (~> 1.0, >= 1.0.1)
   bootsnap
   bootstrap (~> 5.3, >= 5.3.5)
-  brakeman
+  brakeman (~> 7.1, >= 7.1.2)
   bundler-audit
   chartkick (~> 5.2, >= 5.2.1)
   dartsass-rails (~> 0.5.1)
