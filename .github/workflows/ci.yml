@@ -130,6 +130,9 @@ jobs:
       - name: Install JavaScript dependencies
         run: npm ci
 
+      - name: Precompile assets
+        run: bin/rails assets:precompile
+
       - name: Setup test database
         run: |
           bin/rails db:create db:schema:load

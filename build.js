@@ -2,9 +2,10 @@
 
 const { execSync } = require("child_process");
 
-// Determine if we're in production/CI environment or development
+// Determine if we're in production/CI/test environment or development
 const isProduction =
   process.env.RAILS_ENV === "production" ||
+  process.env.RAILS_ENV === "test" ||
   process.env.CI === "true" ||
   process.env.NODE_ENV === "production";
 
