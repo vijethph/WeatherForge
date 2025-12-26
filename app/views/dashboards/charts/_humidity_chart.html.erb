@@ -1,52 +1,84 @@
-<% chart_data = {}
-   locations.each do |location|
-     metrics = location.weather_metrics.where("recorded_at > ?", 24.hours.ago).order(:recorded_at)
-     if metrics.any?
-       data_points = metrics.map do |metric|
-         [metric.recorded_at.strftime('%H:%M'), metric.humidity.to_i]
-       end.to_h
-       chart_data[location.name] = data_points
-     end
-   end
-%>
-
-<% if chart_data.present? && chart_data.values.any?(&:any?) %>
-  <%= line_chart chart_data,
-      xtitle: 'Time',
-      ytitle: 'Humidity (%)',
-      min: 0,
-      max: 100,
-      points: true,
-      download: true,
-      library: {
-        responsive: true,
-        maintainAspectRatio: false,
-        plugins: {
-          legend: {
-            display: true,
-            position: 'bottom'
-          }
-        },
-        scales: {
-          y: {
-            min: 0,
-            max: 100,
-            title: {
-              display: true,
-              text: 'Humidity (%)'
-            }
-          },
-          x: {
-            title: {
-              display: true,
-              text: 'Time'
-            }
-          }
-        }
-      }
-  %>
+<% if location.nil? %>
+  <div class="alert alert-warning mb-0">
+    <i class="bi bi-exclamation-triangle"></i> No location selected.
+  </div>
 <% else %>
-  <div class="alert alert-info mb-0">
-    <i class="bi bi-info-circle"></i> No humidity data available yet. Click "Refresh Now" to fetch weather data.
+  <% metrics = location.weather_metrics_24h.order(:recorded_at) %>
+  <% if metrics.any? %>
+    <div style="height: 350px; position: relative;">
+      <%
+        # Prepare data in simple format for Chartkick
+        chart_data = metrics.map { |metric|
+          [metric.recorded_at.strftime('%H:%M'), metric.humidity]
+        }
+      %>
+      <%= line_chart chart_data,
+          height: '350px',
+          xtitle: 'Time',
+          ytitle: 'Humidity (%)',
+          min: 0,
+          max: 100,
+          curve: false,
+          points: true,
+          colors: ['#0891b2'],
+          library: {
+            animation: {
+              duration: 750
+            },
+            scales: {
+              y: {
+                min: 0,
+                max: 100,
+                ticks: {
+                  callback: "function(value) { return value + '%'; }".html_safe
+                }
+              }
+            },
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                callbacks: {
+                  label: "function(context) { return context.parsed.y + '%'; }".html_safe
+                }
+              }
+            }
+          }
+      %>
+    </div>
+  <% else %>
+    <div class="alert alert-info mb-0">
+      <i class="bi bi-info-circle"></i> No humidity data available for <%= location.name %>. Click "Refresh Now" to fetch weather data.
+    </div>
+  <% end %>
+<% end %>
+
+<% if location.present? && location.weather_metrics_24h.order(:recorded_at).any? %>
+  <!-- Data Table -->
+  <div class="mt-3">
+    <h6>Humidity Data Points (<%= location.weather_metrics_24h.count %> entries)</h6>
+    <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+      <table class="table table-sm table-striped">
+        <thead class="table-dark sticky-top">
+          <tr>
+            <th>Time</th>
+            <th>Humidity</th>
+            <th>Cloud Cover</th>
+            <th>Precipitation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% location.weather_metrics_24h.order(:recorded_at).each do |metric| %>
+            <tr>
+              <td><%= metric.recorded_at.strftime('%H:%M') %></td>
+              <td><%= metric.humidity %>%</td>
+              <td><%= metric.cloud_cover %>%</td>
+              <td><%= metric.precipitation.round(1) %> mm</td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
   </div>
 <% end %>

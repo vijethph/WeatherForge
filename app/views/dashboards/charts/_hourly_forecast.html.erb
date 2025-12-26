@@ -1,82 +1,79 @@
-<% if locations.empty? %>
-  <div class="alert alert-info mb-0">
-    <i class="bi bi-info-circle"></i> No locations available. Add a location to see forecast data.
+<% if location.nil? %>
+  <div class="alert alert-warning mb-0">
+    <i class="bi bi-exclamation-triangle"></i> No location selected.
   </div>
 <% else %>
-  <% first_location = locations.first %>
-  <div class="mb-3">
-    <label for="hourly-location-select" class="form-label fw-bold">Select Location:</label>
-    <select class="form-select" id="hourly-location-select" onchange="updateHourlyChart()">
-      <% locations.each do |location| %>
-        <option value="<%= location.id %>" <%= 'selected' if location == first_location %>>
-          <%= location.name %><% if location.country.present? %>, <%= location.country %><% end %>
-        </option>
-      <% end %>
-    </select>
-  </div>
-
-  <div id="hourly-chart-container">
-    <% locations.each_with_index do |location, index| %>
-      <% forecasts = location.hourly_forecasts.where("forecast_time > ? AND forecast_time < ?", Time.current, 24.hours.from_now).order(:forecast_time).limit(24) %>
-      <div id="hourly-chart-<%= location.id %>" class="chart-wrapper" style="<%= 'display: none;' unless index == 0 %>">
-        <% if forecasts.any? %>
-          <% chart_data = forecasts.map { |f| [f.forecast_time.strftime('%H:%M'), f.temperature.to_f] }.to_h %>
-          <%= line_chart({ location.name => chart_data },
-              xtitle: 'Time (24h)',
-              ytitle: 'Temperature (°C)',
-              points: true,
-              download: true,
-              library: {
-                responsive: true,
-                maintainAspectRatio: false,
-                plugins: {
-                  legend: {
-                    display: false
-                  },
-                  title: {
-                    display: true,
-                    text: "24-Hour Forecast for #{location.name}"
-                  }
-                },
-                scales: {
-                  y: {
-                    title: {
-                      display: true,
-                      text: 'Temperature (°C)'
-                    }
-                  },
-                  x: {
-                    title: {
-                      display: true,
-                      text: 'Time'
-                    }
-                  }
+  <% forecasts = location.hourly_forecasts.where("forecast_time > ? AND forecast_time < ?", Time.current, 24.hours.from_now).order(:forecast_time).limit(24) %>
+  <% if forecasts.any? %>
+    <div style="height: 400px; position: relative;">
+      <%
+        # Prepare data in simple format for Chartkick
+        chart_data = forecasts.map { |f|
+          [f.forecast_time.strftime('%H:%M'), f.temperature.round(1)]
+        }
+      %>
+      <%= line_chart chart_data,
+          height: '400px',
+          xtitle: 'Time',
+          ytitle: 'Temperature (°C)',
+          curve: false,
+          points: true,
+          colors: ['#d97706'],
+          library: {
+            animation: {
+              duration: 750
+            },
+            scales: {
+              y: {
+                beginAtZero: false,
+                ticks: {
+                  callback: "function(value) { return value + '°C'; }".html_safe
                 }
               }
-          ) %>
-        <% else %>
-          <div class="alert alert-warning mb-0">
-            <i class="bi bi-exclamation-triangle"></i> No forecast data available for <%= location.name %>.
-          </div>
-        <% end %>
+            },
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                callbacks: {
+                  label: "function(context) { return context.parsed.y + '°C'; }".html_safe
+                }
+              }
+            }
+          }
+      %>
+    </div>
+
+    <!-- Data Table -->
+    <div class="mt-3">
+      <h6>Forecast Data Points (<%= forecasts.count %> entries)</h6>
+      <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+        <table class="table table-sm table-striped">
+          <thead class="table-dark sticky-top">
+            <tr>
+              <th>Time</th>
+              <th>Temperature</th>
+              <th>Humidity</th>
+              <th>Wind Speed</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% forecasts.each do |forecast| %>
+              <tr>
+                <td><%= forecast.forecast_time.strftime('%H:%M') %></td>
+                <td><%= forecast.temperature.round(1) %>°C</td>
+                <td><%= forecast.humidity %>%</td>
+                <td><%= forecast.wind_speed.round(1) %> km/h</td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
       </div>
-    <% end %>
-  </div>
-
-  <script>
-    function updateHourlyChart() {
-      const select = document.getElementById('hourly-location-select');
-      const locationId = select.value;
-      const charts = document.querySelectorAll('[id^="hourly-chart-"]');
-
-      charts.forEach(chart => {
-        chart.style.display = 'none';
-      });
-
-      const selectedChart = document.getElementById(`hourly-chart-${locationId}`);
-      if (selectedChart) {
-        selectedChart.style.display = 'block';
-      }
-    }
-  </script>
+    </div>
+  <% else %>
+    <div class="alert alert-warning mb-0">
+      <i class="bi bi-exclamation-triangle"></i> No forecast data available for <%= location.name %>. Click "Refresh Now" to fetch forecast data.
+    </div>
+  <% end %>
 <% end %>

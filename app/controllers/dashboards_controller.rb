@@ -7,9 +7,19 @@ class DashboardsController < ApplicationController
   end
 
   def trends
+    @selected_location = if params[:location_id].present?
+                           Location.find_by(id: params[:location_id])
+    else
+                           @locations.first
+    end
   end
 
   def forecasts
+    @selected_location = if params[:location_id].present?
+                           Location.find_by(id: params[:location_id])
+    else
+                           @locations.first
+    end
   end
 
   def environment
