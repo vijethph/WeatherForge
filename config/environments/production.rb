@@ -49,7 +49,7 @@ Rails.application.configure do
 
   # Replace the default in-process memory cache store with a durable alternative.
   # Use memory_store during asset precompilation to avoid database connections
-  config.cache_store = ENV['SKIP_REDIS'] == 'true' ? :memory_store : :solid_cache_store
+  config.cache_store = ENV['SKIP_REDIS'] == 'true' ? :memory_store : [:redis_cache_store, { url: ENV.fetch("REDIS_URL") { "redis://localhost:6379/0" } }]
 
   # Replace the default in-process and non-durable queuing backend for Active Job.
   # Use inline adapter during asset precompilation to avoid Sidekiq initialization
