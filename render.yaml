@@ -1,5 +1,4 @@
 services:
-  # Main web application
   - type: web
     name: weatherforge-web
     runtime: ruby
@@ -18,12 +17,12 @@ services:
         value: production
       - key: DATABASE_URL
         fromDatabase:
-          name: weatherforge-postgres
+          name: common-projects-postgres
           property: connectionString
       - key: REDIS_URL
         fromService:
           type: redis
-          name: weatherforge-redis
+          name: conscious-helicopter
           property: connectionString
       - key: RAILS_MASTER_KEY
         sync: false
@@ -34,7 +33,6 @@ services:
     healthCheckPath: /up
     autoDeploy: true
 
-  # Sidekiq background worker
   - type: worker
     name: weatherforge-sidekiq
     runtime: ruby
@@ -48,12 +46,12 @@ services:
         value: production
       - key: DATABASE_URL
         fromDatabase:
-          name: weatherforge-postgres
+          name: common-projects-postgres
           property: connectionString
       - key: REDIS_URL
         fromService:
           type: redis
-          name: weatherforge-redis
+          name: conscious-helicopter
           property: connectionString
       - key: RAILS_MASTER_KEY
         sync: false
@@ -61,19 +59,10 @@ services:
         value: "true"
     autoDeploy: true
 
-  # Redis for Sidekiq and caching
-  - type: redis
-    name: weatherforge-redis
-    region: oregon
-    plan: free
-    maxmemoryPolicy: allkeys-lru
-    ipAllowList: []
-
-# PostgreSQL database
 databases:
-  - name: weatherforge-postgres
+  - name: common-projects-postgres
     region: oregon
     plan: free
-    databaseName: weatherforge_production
-    user: weatherforge
+    databaseName: common_projects_postgres_production
+    user: renderuser
     postgresMajorVersion: "17"
