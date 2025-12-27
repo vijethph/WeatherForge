@@ -12,10 +12,10 @@
           <i class="bi bi-geo-alt"></i> Manage Locations
         <% end %>
         <div class="dropdown">
-          <button class="btn btn-info dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+          <button class="btn btn-info dropdown-toggle" type="button" id="locationDropdown" data-bs-toggle="dropdown" aria-expanded="false">
             <i class="bi bi-pin-map"></i> <%= @selected_location&.name || "Select Location" %>
           </button>
-          <ul class="dropdown-menu dropdown-menu-end">
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="locationDropdown">
             <% @locations.each do |location| %>
               <li>
                 <%= link_to forecasts_dashboards_path(location_id: location.id), class: "dropdown-item #{'active' if @selected_location&.id == location.id}" do %>
@@ -47,7 +47,7 @@
       <div class="row g-4 mb-4">
         <div class="col-12">
           <div class="card">
-            <div class="card-header bg-warning text-dark">
+            <div class="card-header bg-warning text-white">
               <h5 class="mb-0"><i class="bi bi-clock"></i> 24-Hour Forecast</h5>
             </div>
             <div class="card-body">
@@ -60,7 +60,7 @@
       <div class="row g-4">
         <div class="col-12">
           <div class="card">
-            <div class="card-header bg-secondary text-dark">
+            <div class="card-header bg-secondary text-white">
               <h5 class="mb-0"><i class="bi bi-calendar-event"></i> 10-Day Historical Weather</h5>
             </div>
             <div class="card-body">

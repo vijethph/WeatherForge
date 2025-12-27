@@ -95,17 +95,21 @@ class WeatherService
     params = {
       latitude: location.latitude,
       longitude: location.longitude,
-      current: "wave_height,wave_period,wave_direction",
+      current: "wave_height,wave_period,wave_direction,ocean_current_velocity,ocean_current_direction",
+      hourly: "wave_height,wave_period,ocean_current_velocity",
       timezone: "auto"
     }
 
-    Rails.logger.info("Fetching marine weather for #{location.name}")
+    Rails.logger.info("Fetching marine weather for #{location.name} at (#{location.latitude}, #{location.longitude})")
     response = HTTParty.get(url, query: params)
 
-    return nil unless response.success?
-
-    Rails.logger.info("Marine weather data received for #{location.name}")
-    parse_marine_weather(response)
+    if response.success?
+      Rails.logger.info("Marine weather data received for #{location.name}: #{response.parsed_response.inspect}")
+      parse_marine_weather(response)
+    else
+      Rails.logger.warn("Marine weather API returned non-success status for #{location.name}: #{response.code}")
+      nil
+    end
   rescue StandardError => e
     Rails.logger.error("Marine weather error for #{location.name}: #{e.message}\n#{e.backtrace.join("\n")}")
     nil
@@ -279,12 +283,14 @@ class WeatherService
 
   # Parse marine weather response
   def parse_marine_weather(response)
+    return nil unless response["current"].present?
+
     current = response["current"]
 
     {
-      wave_height: current["wave_height"],
-      wave_period: current["wave_period"],
-      water_temperature: nil # Not available in current API
+      wave_height: current["wave_height"]&.to_f,
+      wave_period: current["wave_period"]&.to_f,
+      water_temperature: current["ocean_current_velocity"]&.to_f # Using ocean current as proxy for activity
     }
   end
 

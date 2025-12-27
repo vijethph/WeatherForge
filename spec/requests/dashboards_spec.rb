@@ -4,7 +4,9 @@ require 'swagger_helper'
 
 RSpec.describe 'Dashboards API', type: :request do
   let!(:location) { create(:location) }
-  let!(:weather_metric) { create(:weather_metric, location: location) }
+  let!(:weather_metric) { create(:weather_metric, location: location, recorded_at: 1.hour.ago) }
+  let!(:hourly_forecast) { create(:hourly_forecast, location: location, forecast_time: 1.hour.from_now) }
+  let!(:historical_weather) { create(:historical_weather, location: location, weather_date: 5.days.ago) }
 
   path '/dashboards' do
     get 'Retrieve main dashboard' do

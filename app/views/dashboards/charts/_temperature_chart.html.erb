@@ -18,27 +18,38 @@
           ytitle: 'Temperature (°C)',
           curve: false,
           points: true,
-          colors: ['#dc2626'],
+          colors: ['#ff0039'],
+          suffix: '°C',
           library: {
             animation: {
               duration: 750
             },
             scales: {
-              y: {
-                beginAtZero: false,
-                ticks: {
-                  callback: "function(value) { return value + '°C'; }".html_safe
+              x: {
+                title: {
+                  display: true,
+                  text: 'Time',
+                  font: {
+                    size: 14,
+                    weight: 'bold'
+                  }
                 }
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: 'Temperature (°C)',
+                  font: {
+                    size: 14,
+                    weight: 'bold'
+                  }
+                },
+                beginAtZero: false
               }
             },
             plugins: {
               legend: {
                 display: false
-              },
-              tooltip: {
-                callbacks: {
-                  label: "function(context) { return context.parsed.y + '°C'; }".html_safe
-                }
               }
             }
           }
@@ -47,7 +58,7 @@
 
     <!-- Data Table -->
     <div class="mt-3">
-      <h6>Temperature Data Points (<%= metrics.count %> entries)</h6>
+      <h6>24-Hour Temperature Summary</h6>
       <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
         <table class="table table-sm table-striped">
           <thead class="table-dark sticky-top">

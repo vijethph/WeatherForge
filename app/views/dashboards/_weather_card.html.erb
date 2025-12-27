@@ -1,7 +1,7 @@
 <div class="col">
   <%= turbo_frame_tag "weather_card_#{location.id}" do %>
     <div class="card h-100 shadow-sm">
-      <div class="card-header bg-gradient-primary text-white">
+      <div class="card-header bg-primary text-white">
         <h5 class="mb-0"><%= location.name %></h5>
         <small>
           <i class="bi bi-geo"></i> <%= location.country || "N/A" %> |

@@ -19,27 +19,38 @@
           min: 0,
           curve: false,
           points: true,
-          colors: ['#059669'],
+          colors: ['#3fb618'],
+          suffix: ' km/h',
           library: {
             animation: {
               duration: 750
             },
             scales: {
-              y: {
-                beginAtZero: true,
-                ticks: {
-                  callback: "function(value) { return value + ' km/h'; }".html_safe
+              x: {
+                title: {
+                  display: true,
+                  text: 'Time',
+                  font: {
+                    size: 14,
+                    weight: 'bold'
+                  }
                 }
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: 'Wind Speed (km/h)',
+                  font: {
+                    size: 14,
+                    weight: 'bold'
+                  }
+                },
+                beginAtZero: true
               }
             },
             plugins: {
               legend: {
                 display: false
-              },
-              tooltip: {
-                callbacks: {
-                  label: "function(context) { return context.parsed.y + ' km/h'; }".html_safe
-                }
               }
             }
           }
@@ -55,7 +66,7 @@
 <% if location.present? && location.weather_metrics_24h.order(:recorded_at).any? %>
   <!-- Data Table -->
   <div class="mt-3">
-    <h6>Wind Speed Data Points (<%= location.weather_metrics_24h.count %> entries)</h6>
+    <h6>24-Hour Wind Speed Summary</h6>
     <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
       <table class="table table-sm table-striped">
         <thead class="table-dark sticky-top">

@@ -1,34 +1,12 @@
-/* Weather Dashboard Custom Styles */
-
-:root {
-  /* WCAG 2.2 AA compliant colors with 4.5:1 contrast ratio */
-  --primary-blue: #0056b3;
-  --info-cyan: #0891b2;
-  --warning-orange: #d97706;
-  --success-green: #047857;
-  --danger-red: #b91c1c;
-  --light-bg: #f8f9fa;
-  --dark-text: #1f2937;
-  --muted-text: #6b7280;
-
-  /* Weather card gradient colors - WCAG compliant */
-  --card-purple-start: #6366f1;
-  --card-purple-end: #8b5cf6;
-  --card-blue-start: #0ea5e9;
-  --card-blue-end: #3b82f6;
-  --card-green-start: #10b981;
-  --card-green-end: #059669;
-}
+/* Weather Dashboard Custom Styles - Using Zephyr Bootstrap Theme */
 
 /* Ensure turbo-frame doesn't interfere with Bootstrap grid */
 turbo-frame {
   display: contents;
 }
 
-/* Weather Card Styling */
+/* Weather Card Hover Effect */
 .card {
-  border: none;
-  border-radius: 12px;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
@@ -37,112 +15,22 @@ turbo-frame {
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15) !important;
 }
 
-.card .card-header {
-  background: linear-gradient(
-    135deg,
-    var(--card-purple-start) 0%,
-    var(--card-purple-end) 100%
-  );
-  border: none;
-  border-radius: 12px 12px 0 0 !important;
-  padding: 1rem 1.25rem;
-}
-
-.card .card-title {
-  font-size: 1.25rem;
-  font-weight: 600;
-  margin-bottom: 0.25rem;
-}
-
-.card .card-header small {
-  opacity: 0.95;
-  font-size: 0.875rem;
-}
-
-/* Chart Card Styling */
-.chart-card {
-  border: none;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
-}
-
-.chart-card .card-header {
-  border: none;
-  border-radius: 12px 12px 0 0;
-  padding: 1rem 1.25rem;
-  font-weight: 600;
-}
-
-.chart-card .card-body {
-  min-height: 350px;
-  padding: 1.5rem;
-  display: flex;
-  flex-direction: column;
-}
-
+/* Chart container minimum height */
 .chart-card .card-body > div {
   width: 100%;
   min-height: 300px;
 }
 
-.chart-card.temperature .card-header {
-  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
-  color: white;
-}
-
-.chart-card.humidity .card-header {
-  background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
-  color: white;
-}
-
-.chart-card.wind .card-header {
-  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
-  color: white;
-}
-
-/* Dashboard Header */
-.dashboard-header {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 2rem;
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
-  margin-bottom: 2rem;
-}
-
-.dashboard-header h1 {
-  font-size: 2.5rem;
-  font-weight: 700;
-}
-
-/* Button Enhancements - Don't override, just enhance */
+/* Button Enhancements */
 .btn:hover {
   transform: translateY(-2px);
   transition: transform 0.2s ease;
 }
 
-.dashboard-header .btn-light {
-  font-weight: 500;
-}
-
-/* Fix button_to form display to prevent block layout */
+/* Fix button_to form display */
 form.d-inline {
   display: inline-block !important;
   margin: 0;
-}
-
-/* Ensure gap utility works for button container */
-.gap-2 {
-  gap: 0.5rem !important;
-}
-
-.d-flex.align-items-center {
-  align-items: center !important;
-}
-
-/* Alert Styling */
-.alert {
-  border-radius: 10px;
 }
 
 /* Location Management Page */
@@ -159,69 +47,15 @@ form.d-inline {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
 }
 
-.location-info h4 {
-  color: var(--dark-text);
-  font-weight: 600;
-  margin-bottom: 0.5rem;
-}
-
-.location-details {
-  color: var(--muted-text);
-  font-size: 0.9rem;
-}
-
-.location-details span {
-  display: inline-block;
-  margin-right: 1.5rem;
-  margin-bottom: 0.5rem;
-}
-
-.location-details i {
-  margin-right: 0.25rem;
-  color: var(--primary-blue);
-}
-
-/* Form Styling - Minimal overrides */
-.form-control:focus,
-.form-select:focus {
-  box-shadow: 0 0 0 0.2rem rgba(13, 110, 253, 0.15);
-}
-
-/* Chart location selector styling */
-.form-label.fw-bold {
-  color: var(--dark-text);
-  font-size: 0.95rem;
-}
-
-.form-select {
-  border-radius: 8px;
-  border: 1px solid #dee2e6;
-  padding: 0.5rem 1rem;
-  transition: border-color 0.2s, box-shadow 0.2s;
-}
-
-.form-select:hover {
-  border-color: #0056b3;
-}
-
+/* Chart wrapper */
 .chart-wrapper {
   min-height: 300px;
   transition: opacity 0.3s ease;
-}
-
-/* Empty State */
-.empty-state i.fs-1 {
-  font-size: 4rem !important;
-  color: var(--muted-text);
 }
 
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .dashboard-header h1 {
     font-size: 1.75rem;
-  }
-
-  .metric-value {
-    font-size: 1.5rem;
   }
 }

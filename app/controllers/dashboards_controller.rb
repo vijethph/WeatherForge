@@ -9,7 +9,7 @@ class DashboardsController < ApplicationController
   def trends
     @selected_location = if params[:location_id].present?
                            Location.find_by(id: params[:location_id])
-    else
+    elsif @locations.any?
                            @locations.first
     end
   end
@@ -17,7 +17,7 @@ class DashboardsController < ApplicationController
   def forecasts
     @selected_location = if params[:location_id].present?
                            Location.find_by(id: params[:location_id])
-    else
+    elsif @locations.any?
                            @locations.first
     end
   end
