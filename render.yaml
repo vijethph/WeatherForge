@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: weatherforge-web
+    name: weatherforge
     runtime: ruby
     region: oregon
     plan: free
@@ -24,6 +24,8 @@ services:
       - key: RAILS_LOG_TO_STDOUT
         value: "true"
       - key: RAILS_SERVE_STATIC_FILES
+        value: "true"
+      - key: SOLID_QUEUE_IN_PUMA
         value: "true"
     healthCheckPath: /up
     autoDeploy: true
