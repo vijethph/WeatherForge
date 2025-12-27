@@ -1,3 +1,14 @@
+[![Status](https://img.shields.io/badge/status-active-success.svg?style=flat-square&logo=ruby)]()
+[![GitHub issues](https://img.shields.io/github/issues/vijethph/WeatherForge?style=flat-square)](https://github.com/vijethph/WeatherForge/issues)
+[![Contributors](https://img.shields.io/github/contributors/vijethph/WeatherForge?style=flat-square)](https://github.com/vijethph/WeatherForge/graphs/contributors)
+[![GitHub forks](https://img.shields.io/github/forks/vijethph/WeatherForge?color=blue&style=flat-square)](https://github.com/vijethph/WeatherForge/network)
+[![GitHub stars](https://img.shields.io/github/stars/vijethph/WeatherForge?color=yellow&style=flat-square)](https://github.com/vijethph/WeatherForge/stargazers)
+[![GitHub license](https://img.shields.io/github/license/vijethph/WeatherForge?style=flat-square)](https://github.com/vijethph/WeatherForge/blob/master/LICENSE)
+[![forthebadge](https://forthebadge.com/images/badges/made-with-ruby.svg)](https://forthebadge.com)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/vijethph/WeatherForge)
+
+<br/>
+
 <div align="center">
   <a href="https://github.com/vijethph/WeatherForge">
     <img src="public/icon.png" alt="Logo" width="80" height="80">
@@ -6,7 +17,7 @@
   <h3 align="center">WeatherForge</h3>
 
   <p align="center">
-    Advanced real-time weather dashboard with multi-API integration
+    A real-time weather dashboard
     <br />
     <a href="https://github.com/vijethph/WeatherForge/issues">Report Bug</a>
     ·
@@ -56,6 +67,14 @@ WeatherForge is a Rails 8.1+ real-time weather dashboard that integrates 7 Open 
 - Background job processing with Sidekiq
 - Swagger/OpenAPI documentation at `/api-docs`
 
+|                                Weather Dashboard                                 |                                 Weather Trends                                 |
+| :------------------------------------------------------------------------------: | :----------------------------------------------------------------------------: |
+| <img src="screenshots/weatherforge1.png" alt="Weather Dashboard" height="400" /> | <img src="screenshots/weatherforge2.png" alt="Weather Trends" height="400"  /> |
+
+|                                Weather Forecasts                                 |                                 Environmental Data                                 |
+| :------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------: |
+| <img src="screenshots/weatherforge3.png" alt="Weather Forecasts" height="500" /> | <img src="screenshots/weatherforge4.png" alt="Environmental Data" height="500"  /> |
+
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 ### Built With
@@ -65,16 +84,6 @@ WeatherForge is a Rails 8.1+ real-time weather dashboard that integrates 7 Open 
 - [![PostgreSQL][PostgreSQL.js]][PostgreSQL-url]
 - [![Redis][Redis.js]][Redis-url]
 - [![Bootstrap][Bootstrap.com]][Bootstrap-url]
-
-**Tech Stack:**
-
-- Rails 8.1+ with Ruby 3.4+
-- PostgreSQL 15+ (production) / SQLite3 (development)
-- Redis 8.2 for job queue
-- Hotwire (Turbo + Stimulus) for real-time UI
-- Sidekiq 8.1 for background jobs
-- Bootstrap 5.3, Chartkick + Chart.js
-- Open Meteo APIs (7 endpoints, free, no auth required)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -273,14 +282,12 @@ Project Link: [https://github.com/vijethph/WeatherForge](https://github.com/vije
 
 <!-- ACKNOWLEDGMENTS -->
 
-## Acknowledgments
+## Acknowledgements
 
 - [Open Meteo](https://open-meteo.com/) - Free weather API
 - [Chartkick](https://chartkick.com/) - JavaScript charts for Ruby
 - [Bootstrap](https://getbootstrap.com/) - CSS framework
-- [Hotwire](https://hotwired.dev/) - Modern web app framework
 - [Sidekiq](https://sidekiq.org/) - Background processing
-- [Best-README-Template](https://github.com/othneildrew/Best-README-Template)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -290,7 +297,7 @@ Project Link: [https://github.com/vijethph/WeatherForge](https://github.com/vije
 [Rails-url]: https://rubyonrails.org/
 [Ruby.js]: https://img.shields.io/badge/Ruby-3.4-CC342D?style=for-the-badge&logo=ruby&logoColor=white
 [Ruby-url]: https://www.ruby-lang.org/
-[PostgreSQL.js]: https://img.shields.io/badge/PostgreSQL-15-316192?style=for-the-badge&logo=postgresql&logoColor=white
+[PostgreSQL.js]: https://img.shields.io/badge/PostgreSQL-17-316192?style=for-the-badge&logo=postgresql&logoColor=white
 [PostgreSQL-url]: https://www.postgresql.org/
 [Redis.js]: https://img.shields.io/badge/Redis-8.2-DC382D?style=for-the-badge&logo=redis&logoColor=white
 [Redis-url]: https://redis.io/
