@@ -23,21 +23,14 @@ test:
 # Store production database in the storage/ directory, which by default
 # is mounted as a persistent Docker volume in config/deploy.yml.
 production:
-  primary: &primary_production
-    adapter: postgresql
-    encoding: unicode
-    pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
-    timeout: 5000
-    url: <%= ENV.fetch("DATABASE_URL", nil) %>
-    database: <%= ENV.fetch("DB_NAME", "weather_dashboard_production") %>
-    username: <%= ENV.fetch("DB_USER", "postgres") %>
-    password: <%= ENV.fetch("DB_PASSWORD", "") %>
-    host: <%= ENV.fetch("DB_HOST", "localhost") %>
-    port: <%= ENV.fetch("DB_PORT", "5432") %>
-    ssl_mode: <%= ENV.fetch("DB_SSL_MODE", "require") %>
-  cable:
-    <<: *primary_production
-  cache:
-    <<: *primary_production
-  queue:
-    <<: *primary_production
+  adapter: postgresql
+  encoding: unicode
+  pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
+  timeout: 5000
+  url: <%= ENV.fetch("DATABASE_URL", nil) %>
+  database: <%= ENV.fetch("DB_NAME", "weather_dashboard_production") %>
+  username: <%= ENV.fetch("DB_USER", "postgres") %>
+  password: <%= ENV.fetch("DB_PASSWORD", "") %>
+  host: <%= ENV.fetch("DB_HOST", "localhost") %>
+  port: <%= ENV.fetch("DB_PORT", "5432") %>
+  ssl_mode: <%= ENV.fetch("DB_SSL_MODE", "require") %>

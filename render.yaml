@@ -8,10 +8,6 @@ services:
     buildCommand: >
       SKIP_REDIS=true bundle install &&
       SKIP_REDIS=true bundle exec rake assets:precompile &&
-      bundle exec rake db:migrate &&
-      bundle exec rake solid_queue:install:migrations &&
-      bundle exec rake solid_cable:install:migrations &&
-      bundle exec rake solid_cache:install:migrations &&
       bundle exec rake db:migrate
     startCommand: bundle exec puma -C config/puma.rb
     envVars:
