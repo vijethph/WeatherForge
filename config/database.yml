@@ -27,9 +27,11 @@ production:
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   timeout: 5000
-  database: weather_dashboard_production
+  # Support both DATABASE_URL and individual ENV vars
+  url: <%= ENV.fetch("DATABASE_URL", nil) %>
+  database: <%= ENV.fetch("DB_NAME", "weather_dashboard_production") %>
   username: <%= ENV.fetch("DB_USER", "postgres") %>
-  password: <%= ENV.fetch("DB_PASSWORD") %>
-  host: <%= ENV.fetch("DB_HOST") %>
-  port: <%= ENV.fetch("DB_PORT", 5432) %>
-  ssl_mode: require
+  password: <%= ENV.fetch("DB_PASSWORD", "") %>
+  host: <%= ENV.fetch("DB_HOST", "localhost") %>
+  port: <%= ENV.fetch("DB_PORT", "5432") %>
+  ssl_mode: <%= ENV.fetch("DB_SSL_MODE", "require") %>

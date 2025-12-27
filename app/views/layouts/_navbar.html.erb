@@ -1,4 +1,4 @@
-<nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
   <div class="container-fluid px-4">
     <%= link_to root_path, class: 'navbar-brand' do %>
       <i class="bi bi-cloud-sun-fill"></i> WeatherForge
@@ -11,6 +11,21 @@
         <li class="nav-item">
           <%= link_to root_path, class: "nav-link #{current_page?(root_path) ? 'active' : ''}" do %>
             <i class="bi bi-speedometer2"></i> Dashboard
+          <% end %>
+        </li>
+        <li class="nav-item">
+          <%= link_to trends_dashboards_path, class: "nav-link #{current_page?(trends_dashboards_path) ? 'active' : ''}" do %>
+            <i class="bi bi-graph-up"></i> Trends
+          <% end %>
+        </li>
+        <li class="nav-item">
+          <%= link_to forecasts_dashboards_path, class: "nav-link #{current_page?(forecasts_dashboards_path) ? 'active' : ''}" do %>
+            <i class="bi bi-clock"></i> Forecasts
+          <% end %>
+        </li>
+        <li class="nav-item">
+          <%= link_to environment_dashboards_path, class: "nav-link #{current_page?(environment_dashboards_path) ? 'active' : ''}" do %>
+            <i class="bi bi-water"></i> Environment
           <% end %>
         </li>
         <li class="nav-item">

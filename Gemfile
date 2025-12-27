@@ -52,7 +52,7 @@ group :development, :test do
   gem "bundler-audit", require: false
 
   # Static analysis for security vulnerabilities [https://brakemanscanner.org/]
-  gem "brakeman", require: false
+  gem "brakeman", "~> 7.1", ">= 7.1.2", require: false
 
   # Omakase Ruby styling [https://github.com/rails/rubocop-rails-omakase/]
   gem "rubocop-rails-omakase", require: false
@@ -76,6 +76,7 @@ gem "better_errors", "~> 2.10", ">= 2.10.1"
 gem "binding_of_caller", "~> 1.0", ">= 1.0.1"
 gem "lograge", "~> 0.14.0"
 gem "dotenv-rails", "~> 3.2"
+gem "rswag", "~> 2.17"
 
 gem "rspec-rails", "~> 8.0", ">= 8.0.2", group: [ :development, :test ]
 gem "factory_bot_rails", "~> 6.5", ">= 6.5.1", group: [ :development, :test ]

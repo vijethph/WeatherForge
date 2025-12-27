@@ -1,0 +1,90 @@
+<% if location.nil? %>
+  <div class="alert alert-warning mb-0">
+    <i class="bi bi-exclamation-triangle"></i> No location selected.
+  </div>
+<% else %>
+  <% metrics = location.weather_metrics_24h.order(:recorded_at) %>
+  <% if metrics.any? %>
+    <div style="height: 350px; position: relative;">
+      <%
+        # Prepare data in simple format for Chartkick
+        chart_data = metrics.map { |metric|
+          [metric.recorded_at.strftime('%H:%M'), metric.temperature.round(1)]
+        }
+      %>
+      <%= line_chart chart_data,
+          height: '350px',
+          xtitle: 'Time',
+          ytitle: 'Temperature (°C)',
+          curve: false,
+          points: true,
+          colors: ['#ff0039'],
+          suffix: '°C',
+          library: {
+            animation: {
+              duration: 750
+            },
+            scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: 'Time',
+                  font: {
+                    size: 14,
+                    weight: 'bold'
+                  }
+                }
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: 'Temperature (°C)',
+                  font: {
+                    size: 14,
+                    weight: 'bold'
+                  }
+                },
+                beginAtZero: false
+              }
+            },
+            plugins: {
+              legend: {
+                display: false
+              }
+            }
+          }
+      %>
+    </div>
+
+    <!-- Data Table -->
+    <div class="mt-3">
+      <h6>24-Hour Temperature Summary</h6>
+      <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+        <table class="table table-sm table-striped">
+          <thead class="table-dark sticky-top">
+            <tr>
+              <th>Time</th>
+              <th>Temperature (°C)</th>
+              <th>Temperature (°F)</th>
+              <th>Feels Like</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% metrics.each do |metric| %>
+              <tr>
+                <td><%= metric.recorded_at.strftime('%H:%M') %></td>
+                <td><%= metric.temperature.round(1) %>°C</td>
+                <td><%= metric.temperature_fahrenheit.round(1) %>°F</td>
+                <td><%= metric.feels_like.round(1) %>°C</td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% else %>
+    <div class="alert alert-warning mb-0">
+      <i class="bi bi-exclamation-triangle"></i> No temperature data available for <%= location.name %> in the last 24 hours. Click "Refresh Now" to fetch data.
+    </div>
+  <% end %>
+<% end %>

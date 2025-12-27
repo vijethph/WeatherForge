@@ -61,8 +61,13 @@ COPY . .
 # -j 1 disable parallel compilation to avoid a QEMU bug: https://github.com/rails/bootsnap/issues/495
 RUN bundle exec bootsnap precompile -j 1 app/ lib/
 
-# Precompiling assets for production without requiring secret RAILS_MASTER_KEY
-RUN SECRET_KEY_BASE_DUMMY=1 ./bin/rails assets:precompile
+# Precompiling assets for production without requiring database connections
+# Use rake directly to avoid full Rails initialization
+# SKIP_REDIS=true prevents Sidekiq from trying to connect to Redis
+RUN RAILS_ENV=production \
+    SECRET_KEY_BASE_DUMMY=1 \
+    SKIP_REDIS=true \
+    bundle exec rake assets:precompile
 
 
 RUN rm -rf node_modules

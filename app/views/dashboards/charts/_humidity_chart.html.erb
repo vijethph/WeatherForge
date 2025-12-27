@@ -1,0 +1,95 @@
+<% if location.nil? %>
+  <div class="alert alert-warning mb-0">
+    <i class="bi bi-exclamation-triangle"></i> No location selected.
+  </div>
+<% else %>
+  <% metrics = location.weather_metrics_24h.order(:recorded_at) %>
+  <% if metrics.any? %>
+    <div style="height: 350px; position: relative;">
+      <%
+        # Prepare data in simple format for Chartkick
+        chart_data = metrics.map { |metric|
+          [metric.recorded_at.strftime('%H:%M'), metric.humidity]
+        }
+      %>
+      <%= line_chart chart_data,
+          height: '350px',
+          xtitle: 'Time',
+          ytitle: 'Humidity (%)',
+          min: 0,
+          max: 100,
+          curve: false,
+          points: true,
+          colors: ['#0ea8d9'],
+          suffix: '%',
+          library: {
+            animation: {
+              duration: 750
+            },
+            scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: 'Time',
+                  font: {
+                    size: 14,
+                    weight: 'bold'
+                  }
+                }
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: 'Humidity (%)',
+                  font: {
+                    size: 14,
+                    weight: 'bold'
+                  }
+                },
+                min: 0,
+                max: 100
+              }
+            },
+            plugins: {
+              legend: {
+                display: false
+              }
+            }
+          }
+      %>
+    </div>
+  <% else %>
+    <div class="alert alert-info mb-0">
+      <i class="bi bi-info-circle"></i> No humidity data available for <%= location.name %>. Click "Refresh Now" to fetch weather data.
+    </div>
+  <% end %>
+<% end %>
+
+<% if location.present? && location.weather_metrics_24h.order(:recorded_at).any? %>
+  <!-- Data Table -->
+  <div class="mt-3">
+    <h6>24-Hour Humidity Summary</h6>
+    <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+      <table class="table table-sm table-striped">
+        <thead class="table-dark sticky-top">
+          <tr>
+            <th>Time</th>
+            <th>Humidity</th>
+            <th>Cloud Cover</th>
+            <th>Precipitation</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% location.weather_metrics_24h.order(:recorded_at).each do |metric| %>
+            <tr>
+              <td><%= metric.recorded_at.strftime('%H:%M') %></td>
+              <td><%= metric.humidity %>%</td>
+              <td><%= metric.cloud_cover %>%</td>
+              <td><%= metric.precipitation.round(1) %> mm</td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+<% end %>

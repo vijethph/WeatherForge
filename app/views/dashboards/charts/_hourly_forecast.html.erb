@@ -1,0 +1,90 @@
+<% if location.nil? %>
+  <div class="alert alert-warning mb-0">
+    <i class="bi bi-exclamation-triangle"></i> No location selected.
+  </div>
+<% else %>
+  <% forecasts = location.hourly_forecasts.where("forecast_time > ? AND forecast_time < ?", Time.current, 24.hours.from_now).order(:forecast_time).limit(24) %>
+  <% if forecasts.any? %>
+    <div style="height: 400px; position: relative;">
+      <%
+        # Prepare data in simple format for Chartkick
+        chart_data = forecasts.map { |f|
+          [f.forecast_time.strftime('%H:%M'), f.temperature.round(1)]
+        }
+      %>
+      <%= line_chart chart_data,
+          height: '400px',
+          xtitle: 'Time',
+          ytitle: 'Temperature (°C)',
+          curve: false,
+          points: true,
+          colors: ['#ff7518'],
+          suffix: '°C',
+          library: {
+            animation: {
+              duration: 750
+            },
+            scales: {
+              x: {
+                title: {
+                  display: true,
+                  text: 'Time',
+                  font: {
+                    size: 14,
+                    weight: 'bold'
+                  }
+                }
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: 'Temperature (°C)',
+                  font: {
+                    size: 14,
+                    weight: 'bold'
+                  }
+                },
+                beginAtZero: false
+              }
+            },
+            plugins: {
+              legend: {
+                display: false
+              }
+            }
+          }
+      %>
+    </div>
+
+    <!-- Data Table -->
+    <div class="mt-3">
+      <h6>24-Hour Weather Forecast</h6>
+      <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+        <table class="table table-sm table-striped">
+          <thead class="table-dark sticky-top">
+            <tr>
+              <th>Time</th>
+              <th>Temperature</th>
+              <th>Humidity</th>
+              <th>Wind Speed</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% forecasts.each do |forecast| %>
+              <tr>
+                <td><%= forecast.forecast_time.strftime('%H:%M') %></td>
+                <td><%= forecast.temperature.round(1) %>°C</td>
+                <td><%= forecast.humidity %>%</td>
+                <td><%= forecast.wind_speed.round(1) %> km/h</td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% else %>
+    <div class="alert alert-warning mb-0">
+      <i class="bi bi-exclamation-triangle"></i> No forecast data available for <%= location.name %>. Click "Refresh Now" to fetch forecast data.
+    </div>
+  <% end %>
+<% end %>

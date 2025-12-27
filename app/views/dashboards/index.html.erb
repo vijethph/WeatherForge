@@ -1,14 +1,17 @@
-<div class="container-fluid px-4 py-4">
-  <div class="dashboard-header mb-4">
-    <div class="row align-items-center">
-      <div class="col-lg-9 col-md-8">
-        <h1 class="mb-2">
-          <i class="bi bi-cloud-sun"></i> Weather Dashboard
-        </h1>
-        <p class="lead mb-0">Real-time weather metrics from multiple locations</p>
-      </div>
-      <div class="col-lg-3 col-md-4 text-md-end mt-3 mt-md-0">
-        <%= button_to sync_weather_path, method: :post, class: 'btn btn-light w-100', form: { style: 'display: inline;' } do %>
+<div class="container-fluid mt-4">
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h1 class="display-4">
+        <i class="bi bi-cloud-sun"></i> Weather Dashboard
+      </h1>
+      <p class="lead text-muted">Real-time weather conditions for your locations</p>
+    </div>
+    <div class="col-md-4 text-end">
+      <div class="d-flex justify-content-end align-items-center gap-2">
+        <%= link_to locations_path, class: "btn btn-primary" do %>
+          <i class="bi bi-geo-alt"></i> Manage Locations
+        <% end %>
+        <%= button_to sync_weather_dashboards_path, method: :post, class: "btn btn-info", form: { data: { turbo: false }, class: "d-inline" } do %>
           <i class="bi bi-arrow-clockwise"></i> Refresh Now
         <% end %>
       </div>
@@ -16,70 +19,24 @@
   </div>
 
   <% if @locations.empty? %>
-    <div class="row">
-      <div class="col-12">
-        <div class="empty-state text-center py-5">
-          <i class="bi bi-cloud-slash fs-1 mb-3"></i>
-          <h3>No locations added yet</h3>
-          <p class="text-muted">Add your first location to start tracking weather data</p>
-          <%= link_to 'Add Location', locations_path, class: 'btn btn-primary btn-lg mt-3' %>
-        </div>
-      </div>
+    <div class="alert alert-info text-center py-5">
+      <i class="bi bi-cloud-slash" style="font-size: 4rem;"></i>
+      <h3 class="mt-3">No locations added yet</h3>
+      <p class="text-muted">Add your first location to start tracking weather data</p>
+      <%= link_to "Add Location", locations_path, class: "btn btn-primary btn-lg mt-3" %>
     </div>
   <% else %>
-    <div class="row g-4 mb-4">
+    <!-- Weather Cards -->
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
       <% @locations.each do |location| %>
-        <div class="col-lg-4 col-md-6 col-12">
-          <%= turbo_frame_tag "weather_card_#{location.id}" do %>
-            <%= render 'dashboards/weather_card', location: location %>
-          <% end %>
-        </div>
+        <%= render "dashboards/weather_card", location: location %>
       <% end %>
     </div>
 
-    <div class="row g-4 mb-4">
-      <div class="col-lg-6 col-md-12">
-        <div class="card chart-card temperature h-100">
-          <div class="card-header text-white">
-            <h5 class="mb-0">
-              <i class="bi bi-thermometer-half"></i> Temperature Trend (24h)
-            </h5>
-          </div>
-          <div class="card-body">
-            <%= render 'dashboards/temperature_chart', locations: @locations %>
-          </div>
-        </div>
-      </div>
-
-      <div class="col-lg-6 col-md-12">
-        <div class="card chart-card humidity h-100">
-          <div class="card-header text-white">
-            <h5 class="mb-0">
-              <i class="bi bi-droplet-fill"></i> Humidity Trend (24h)
-            </h5>
-          </div>
-          <div class="card-body">
-            <%= render 'dashboards/humidity_chart', locations: @locations %>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="row g-4 mb-4">
-      <div class="col-12">
-        <div class="card chart-card wind h-100">
-          <div class="card-header text-white">
-            <h5 class="mb-0">
-              <i class="bi bi-wind"></i> Wind Speed Trend (24h)
-            </h5>
-          </div>
-          <div class="card-body">
-            <%= render 'dashboards/wind_speed_chart', locations: @locations %>
-          </div>
-        </div>
-      </div>
-    </div>
-
+    <!-- Auto-refresh subscription -->
     <%= turbo_stream_from "location_updates" %>
   <% end %>
 </div>
+
+<!-- Add bottom spacing -->
+<div class="mb-5 pb-4"></div>

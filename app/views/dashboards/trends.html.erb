@@ -1,0 +1,90 @@
+<div class="container-fluid mt-4">
+  <div class="row mb-4">
+    <div class="col-md-8">
+      <h1 class="display-5">
+        <i class="bi bi-graph-up"></i> Weather Trends
+      </h1>
+      <p class="lead text-muted">24-hour temperature and humidity analysis</p>
+    </div>
+    <div class="col-md-4 text-end">
+      <div class="d-flex justify-content-end align-items-center gap-2">
+        <%= link_to locations_path, class: "btn btn-primary" do %>
+          <i class="bi bi-geo-alt"></i> Manage Locations
+        <% end %>
+        <div class="dropdown">
+          <button class="btn btn-info dropdown-toggle" type="button" id="locationDropdownTrends" data-bs-toggle="dropdown" aria-expanded="false">
+            <i class="bi bi-pin-map"></i> <%= @selected_location&.name || "Select Location" %>
+          </button>
+          <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="locationDropdownTrends">
+            <% @locations.each do |location| %>
+              <li>
+                <%= link_to trends_dashboards_path(location_id: location.id), class: "dropdown-item #{'active' if @selected_location&.id == location.id}" do %>
+                  <%= location.name %>
+                <% end %>
+              </li>
+            <% end %>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <% if @locations.empty? %>
+    <div class="alert alert-info text-center py-5">
+      <i class="bi bi-cloud-slash" style="font-size: 4rem;"></i>
+      <h3 class="mt-3">No locations added yet</h3>
+      <p class="text-muted">Add locations to view weather trends</p>
+      <%= link_to "Add Location", locations_path, class: "btn btn-primary btn-lg mt-3" %>
+    </div>
+  <% else %>
+    <% if @selected_location.nil? %>
+      <div class="alert alert-warning text-center py-5">
+        <i class="bi bi-exclamation-triangle" style="font-size: 4rem;"></i>
+        <h3 class="mt-3">No location selected</h3>
+        <p class="text-muted">Please select a location from the dropdown above</p>
+      </div>
+    <% else %>
+      <div class="row g-4 mb-4">
+        <div class="col-lg-6">
+          <div class="card h-100">
+            <div class="card-header bg-primary text-white">
+              <h5 class="mb-0"><i class="bi bi-thermometer-half"></i> Temperature Trend (24h)</h5>
+            </div>
+            <div class="card-body">
+              <%= render "dashboards/charts/temperature_chart", location: @selected_location %>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-6">
+          <div class="card h-100">
+            <div class="card-header bg-info text-white">
+              <h5 class="mb-0"><i class="bi bi-droplet-half"></i> Humidity Levels (24h)</h5>
+            </div>
+            <div class="card-body">
+              <%= render "dashboards/charts/humidity_chart", location: @selected_location %>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-4">
+        <div class="col-12">
+          <div class="card">
+            <div class="card-header bg-success text-white">
+              <h5 class="mb-0"><i class="bi bi-wind"></i> Wind Speed Trend (24h)</h5>
+            </div>
+            <div class="card-body">
+              <%= render "dashboards/charts/wind_speed_chart", location: @selected_location %>
+            </div>
+          </div>
+        </div>
+      </div>
+    <% end %>
+
+    <%= turbo_stream_from "location_updates" %>
+  <% end %>
+</div>
+
+<!-- Add bottom spacing -->
+<div class="mb-5 pb-4"></div>

@@ -1,0 +1,35 @@
+<% if locations.any? %>
+  <div class="row">
+    <% locations.each do |location| %>
+      <% flood = location.latest_flood_risk %>
+      <% if flood.present? %>
+        <div class="col-md-6 mb-3">
+          <div class="card border-<%= flood.severity_info[:color] || 'secondary' %>">
+            <div class="card-body">
+              <h6><%= location.name %></h6>
+              <div class="mb-2">
+                <% badge_class = case flood.flood_severity
+                                when "low" then "success"
+                                when "moderate" then "warning"
+                                when "high" then "danger"
+                                else "secondary"
+                                end %>
+                <span class="badge bg-<%= badge_class %>">
+                  <%= flood.flood_severity&.upcase || "UNKNOWN" %>
+                </span>
+              </div>
+              <p class="mb-1">
+                <strong><%= flood.flood_description %></strong>
+              </p>
+              <small class="text-muted">
+                Probability: <%= (flood.flood_probability * 100).round(1) %>%
+              </small>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+<% else %>
+  <div class="alert alert-info">No flood risk data available yet</div>
+<% end %>

@@ -1,0 +1,100 @@
+<% if location.nil? %>
+  <div class="alert alert-warning mb-0">
+    <i class="bi bi-exclamation-triangle"></i> No location selected.
+  </div>
+<% else %>
+  <% history = location.historical_weathers.where("weather_date > ?", 10.days.ago).order(:weather_date) %>
+  <% if history.any? %>
+    <div style="height: 400px; position: relative;">
+      <%
+        # Prepare data with explicit date labels to prevent Chart.js from parsing as timestamps
+        chart_data = history.map { |h|
+          # Use just the date string without year to avoid timestamp parsing
+          date_label = h.weather_date.strftime('%b %d')
+          [date_label, h.avg_temperature.round(1)]
+        }
+      %>
+      <%= line_chart chart_data,
+          height: '400px',
+          xtitle: 'Date',
+          ytitle: 'Avg Temperature (°C)',
+          curve: false,
+          points: true,
+          colors: ['#9954bb'],
+          suffix: '°C',
+          library: {
+            animation: {
+              duration: 750
+            },
+            scales: {
+              x: {
+                type: 'category',
+                title: {
+                  display: true,
+                  text: 'Date',
+                  font: {
+                    size: 14,
+                    weight: 'bold'
+                  }
+                }
+              },
+              y: {
+                title: {
+                  display: true,
+                  text: 'Avg Temperature (°C)',
+                  font: {
+                    size: 14,
+                    weight: 'bold'
+                  }
+                },
+                beginAtZero: false
+              }
+            },
+            plugins: {
+              legend: {
+                display: false
+              },
+              tooltip: {
+                callbacks: {
+                  title: "function(tooltipItems) { return tooltipItems[0].label; }".html_safe
+                }
+              }
+            }
+          }
+      %>
+    </div>
+
+    <!-- Data Table -->
+    <div class="mt-3">
+      <h6>10-Day Historical Weather Summary</h6>
+      <div class="table-responsive" style="max-height: 300px; overflow-y: auto;">
+        <table class="table table-sm table-striped">
+          <thead class="table-dark sticky-top">
+            <tr>
+              <th>Date</th>
+              <th>Max Temp</th>
+              <th>Min Temp</th>
+              <th>Avg Temp</th>
+              <th>Precipitation</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% history.each do |h| %>
+              <tr>
+                <td><%= h.weather_date.strftime('%b %d') %></td>
+                <td><%= h.max_temperature.round(1) %>&deg;C</td>
+                <td><%= h.min_temperature.round(1) %>&deg;C</td>
+                <td><%= h.avg_temperature.round(1) %>&deg;C</td>
+                <td><%= h.total_precipitation.round(1) %> mm</td>
+              </tr>
+            <% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  <% else %>
+    <div class="alert alert-warning mb-0">
+      <i class="bi bi-exclamation-triangle"></i> No historical data available for <%= location.name %>. Click "Refresh Now" to fetch historical data.
+    </div>
+  <% end %>
+<% end %>

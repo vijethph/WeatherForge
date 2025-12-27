@@ -1,0 +1,53 @@
+<% if locations.any? %>
+  <div class="row">
+    <% locations.each do |location| %>
+      <% air = location.latest_air_quality %>
+      <% if air.present? %>
+        <div class="col-md-6 mb-3">
+          <div class="card">
+            <div class="card-body">
+              <h6><%= location.name %></h6>
+              <div class="mb-2">
+                <% aqi_color = case air.aqi_level
+                               when 1 then "success"
+                               when 2 then "info"
+                               when 3 then "warning"
+                               when 4..5 then "danger"
+                               end %>
+                <span class="badge bg-<%= aqi_color %>">
+                  AQI <%= air.aqi_level %> - <%= air.aqi_name %>
+                </span>
+              </div>
+              <div class="row small">
+                <div class="col-6">
+                  <small class="text-muted">PM2.5</small>
+                  <div><%= air.pm2_5&.round(1) %> µg/m³</div>
+                </div>
+                <div class="col-6">
+                  <small class="text-muted">PM10</small>
+                  <div><%= air.pm10&.round(1) %> µg/m³</div>
+                </div>
+              </div>
+              <div class="row small mt-2">
+                <div class="col-4">
+                  <small class="text-muted">O3</small>
+                  <div><%= air.o3&.round(1) %></div>
+                </div>
+                <div class="col-4">
+                  <small class="text-muted">NO2</small>
+                  <div><%= air.no2&.round(1) %></div>
+                </div>
+                <div class="col-4">
+                  <small class="text-muted">SO2</small>
+                  <div><%= air.so2&.round(1) %></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% end %>
+    <% end %>
+  </div>
+<% else %>
+  <div class="alert alert-info">No air quality data available yet</div>
+<% end %>

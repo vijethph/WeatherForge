@@ -1,118 +1,140 @@
-<div class="container-fluid px-4 py-4">
+<div class="container mt-4">
   <div class="row mb-4">
-    <div class="col-12">
-      <h1 class="display-5">
-        <i class="bi bi-geo-alt-fill"></i> Manage Locations
-      </h1>
-      <p class="text-muted">Add or remove weather monitoring locations</p>
+    <div class="col-md-8">
+      <h1><i class="bi bi-geo-alt-fill"></i> Manage Weather Locations</h1>
+      <p class="text-muted">Search and add locations to monitor weather data</p>
+    </div>
+    <div class="col-md-4 text-end">
+      <%= link_to dashboards_path, class: "btn btn-secondary" do %>
+        <i class="bi bi-arrow-left"></i> Back to Dashboard
+      <% end %>
     </div>
   </div>
 
   <div class="row">
-    <div class="col-lg-5 col-md-12 mb-4">
-      <div class="card h-100">
+    <div class="col-md-6">
+      <div class="card mb-4">
         <div class="card-header bg-primary text-white">
-          <h5 class="mb-0"><i class="bi bi-plus-circle"></i> Add New Location</h5>
+          <h5 class="mb-0"><i class="bi bi-search"></i> Search & Add Location</h5>
         </div>
         <div class="card-body">
-          <%= form_with model: @location, local: true, class: 'needs-validation' do |f| %>
+          <%= form_with url: search_locations_path, method: :get, local: true, class: "mb-3" do |f| %>
+            <div class="input-group">
+              <%= f.text_field :query,
+                    value: params[:query],
+                    placeholder: "Search locations (min 3 chars)",
+                    class: "form-control",
+                    autocomplete: "off",
+                    id: "location-search-input" %>
+              <%= f.submit "Search", class: "btn btn-primary" %>
+            </div>
+          <% end %>
+
+          <div id="search-results">
+            <% if @search_results.present? && @search_results.any? %>
+              <div class="list-group">
+                <% @search_results.each do |result| %>
+                  <%= form_with model: @location, local: true, class: "d-inline" do |f| %>
+                    <%= f.hidden_field :name, value: result[:name] %>
+                    <%= f.hidden_field :latitude, value: result[:latitude] %>
+                    <%= f.hidden_field :longitude, value: result[:longitude] %>
+                    <%= f.hidden_field :timezone, value: result[:timezone] %>
+                    <%= f.hidden_field :country, value: result[:country] %>
+                    <button type="submit" class="list-group-item list-group-item-action">
+                      <strong><%= result[:name] %></strong>
+                      <br>
+                      <small class="text-muted">
+                        <%= result[:country] %> |
+                        <%= "#{result[:latitude].round(4)}, #{result[:longitude].round(4)}" %>
+                      </small>
+                    </button>
+                  <% end %>
+                <% end %>
+              </div>
+            <% elsif params[:query].present? %>
+              <div class="alert alert-info">No results found for "<%= params[:query] %>"</div>
+            <% end %>
+          </div>
+
+          <hr class="my-4">
+
+          <h6>Or Add Manually</h6>
+          <%= form_with model: @location, local: true, class: "needs-validation" do |f| %>
             <div class="mb-3">
-              <%= f.label :name, class: 'form-label' %>
-              <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-pin-map"></i></span>
-                <%= f.text_field :name, class: 'form-control', placeholder: 'e.g., New York', required: true %>
+              <%= f.label :name, class: "form-label" %>
+              <%= f.text_field :name, class: "form-control", placeholder: "Location name", required: true %>
+            </div>
+
+            <div class="row">
+              <div class="col-md-6 mb-3">
+                <%= f.label :latitude, class: "form-label" %>
+                <%= f.number_field :latitude, step: 0.0001, class: "form-control", placeholder: "e.g., 51.5074", required: true %>
+              </div>
+              <div class="col-md-6 mb-3">
+                <%= f.label :longitude, class: "form-label" %>
+                <%= f.number_field :longitude, step: 0.0001, class: "form-control", placeholder: "e.g., -0.1278", required: true %>
               </div>
             </div>
 
             <div class="mb-3">
-              <%= f.label :latitude, class: 'form-label' %>
-              <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-compass"></i></span>
-                <%= f.number_field :latitude, step: 0.000001, class: 'form-control', placeholder: 'e.g., 40.7128', required: true %>
-              </div>
-              <small class="text-muted">Range: -90 to 90</small>
-            </div>
-
-            <div class="mb-3">
-              <%= f.label :longitude, class: 'form-label' %>
-              <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-compass"></i></span>
-                <%= f.number_field :longitude, step: 0.000001, class: 'form-control', placeholder: 'e.g., -74.0060', required: true %>
-              </div>
-              <small class="text-muted">Range: -180 to 180</small>
-            </div>
-
-            <div class="mb-3">
-              <%= f.label :timezone, class: 'form-label' %>
-              <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-clock"></i></span>
-                <%= f.text_field :timezone, class: 'form-control', placeholder: 'e.g., America/New_York', required: true %>
-              </div>
+              <%= f.label :timezone, class: "form-label" %>
+              <%= f.text_field :timezone, class: "form-control", placeholder: "e.g., Europe/London", required: true %>
               <small class="text-muted">Format: Continent/City</small>
             </div>
 
             <div class="mb-3">
-              <%= f.label :description, class: 'form-label' %>
-              <div class="input-group">
-                <span class="input-group-text"><i class="bi bi-text-left"></i></span>
-                <%= f.text_area :description, class: 'form-control', rows: 3, placeholder: 'Optional description...' %>
-              </div>
+              <%= f.label :country, class: "form-label" %>
+              <%= f.text_field :country, class: "form-control", placeholder: "Country name" %>
             </div>
 
-            <div class="d-grid">
-              <%= f.submit 'Add Location', class: 'btn btn-success btn-lg' %>
+            <div class="mb-3">
+              <%= f.label :description, class: "form-label" %>
+              <%= f.text_area :description, rows: 3, class: "form-control", placeholder: "Optional notes" %>
             </div>
+
+            <%= f.submit "Add Location", class: "btn btn-success w-100" %>
           <% end %>
-
-          <div class="mt-3">
-            <small class="text-muted">
-              <i class="bi bi-info-circle"></i> <strong>Tip:</strong> Find coordinates on <a href="https://www.latlong.net/" target="_blank">LatLong.net</a> or Google Maps
-            </small>
-          </div>
         </div>
       </div>
     </div>
 
-    <div class="col-lg-7 col-md-12">
-      <div class="card h-100">
+    <div class="col-md-6">
+      <div class="card">
         <div class="card-header bg-secondary text-white">
-          <h5 class="mb-0">
-            <i class="bi bi-list-ul"></i> Current Locations (<%= @locations.count %>)
-          </h5>
+          <h5 class="mb-0"><i class="bi bi-list-ul"></i> Current Locations (<%= @locations.count %>)</h5>
         </div>
         <div class="card-body">
-          <% if @locations.empty? %>
-            <div class="text-center py-5">
-              <i class="bi bi-inbox fs-1 text-muted mb-3 d-block"></i>
-              <h4>No locations yet</h4>
-              <p class="text-muted">Add your first location using the form on the left</p>
-            </div>
-          <% else %>
+          <% if @locations.any? %>
             <div class="list-group">
               <% @locations.each do |location| %>
-                <div class="location-item">
-                  <div class="d-flex justify-content-between align-items-start">
-                    <div class="location-info flex-grow-1">
-                      <h4><i class="bi bi-geo-alt-fill text-primary"></i> <%= location.name %></h4>
-                      <div class="location-details">
-                        <span><i class="bi bi-compass"></i> <strong>Lat:</strong> <%= location.latitude.round(4) %></span>
-                        <span><i class="bi bi-compass"></i> <strong>Lon:</strong> <%= location.longitude.round(4) %></span>
-                        <span><i class="bi bi-clock"></i> <%= location.timezone %></span>
-                      </div>
-                      <% if location.description.present? %>
-                        <p class="text-muted mb-0 mt-2"><%= location.description %></p>
-                      <% end %>
+                <div class="list-group-item">
+                  <div class="d-flex w-100 justify-content-between align-items-start">
+                    <div>
+                      <h6 class="mb-1"><%= location.name %></h6>
+                      <small class="text-muted">
+                        <i class="bi bi-geo"></i> <%= location.latitude.round(4) %>, <%= location.longitude.round(4) %>
+                        <% if location.elevation.present? %>
+                          | <i class="bi bi-mountain"></i> <%= location.elevation.round(0) %>m
+                        <% end %>
+                        <br>
+                        <i class="bi bi-clock"></i> <%= location.timezone %>
+                        <% if location.country.present? %>
+                          | <i class="bi bi-flag"></i> <%= location.country %>
+                        <% end %>
+                      </small>
                     </div>
-                    <div class="location-actions">
-                      <%= button_to location_path(location), method: :delete,
-                          data: { turbo_confirm: "Are you sure you want to delete #{location.name}?" },
-                          class: 'btn btn-danger btn-sm' do %>
-                        <i class="bi bi-trash"></i> Delete
-                      <% end %>
-                    </div>
+                    <%= button_to location_path(location), method: :delete,
+                          class: "btn btn-sm btn-danger",
+                          data: { turbo_confirm: "Are you sure you want to remove #{location.name}?" } do %>
+                      <i class="bi bi-trash"></i>
+                    <% end %>
                   </div>
                 </div>
               <% end %>
+            </div>
+          <% else %>
+            <div class="alert alert-info text-center">
+              <i class="bi bi-info-circle"></i> No locations added yet. Search and add one!
             </div>
           <% end %>
         </div>
@@ -120,3 +142,21 @@
     </div>
   </div>
 </div>
+
+<script>
+  // Auto-submit search on input with debounce
+  document.addEventListener('DOMContentLoaded', () => {
+    const queryInput = document.getElementById('location-search-input');
+    if (queryInput) {
+      let timeout = null;
+      queryInput.addEventListener('input', () => {
+        clearTimeout(timeout);
+        if (queryInput.value.length >= 3) {
+          timeout = setTimeout(() => {
+            queryInput.form.submit();
+          }, 500);
+        }
+      });
+    }
+  });
+</script>
