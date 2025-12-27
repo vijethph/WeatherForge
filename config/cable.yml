@@ -9,8 +9,6 @@ test:
   adapter: test
 
 production:
-  # Solid Cable for Render free plan (no Redis needed)
-  # Using single database configuration - no separate cable database
-  adapter: solid_cable
-  polling_interval: 0.1.seconds
-  message_retention: 1.day
+  # Using async adapter to avoid database configuration complexity
+  # For multi-server deployments, consider Redis or upgrading Render plan
+  adapter: async

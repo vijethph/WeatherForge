@@ -48,9 +48,9 @@ Rails.application.configure do
   config.active_support.report_deprecations = false
 
   # Replace the default in-process memory cache store with a durable alternative.
-  # Use memory_store during asset precompilation to avoid database connections
-  # Solid Cache (PostgreSQL-backed) for production - works on Render free plan
-  config.cache_store = ENV['SKIP_REDIS'] == 'true' ? :memory_store : :solid_cache_store
+  # Use memory_store to avoid additional database connections and reduce memory usage
+  # For larger deployments, consider Redis or upgrading Render plan for Solid Cache
+  config.cache_store = :memory_store
 
     # Replace the default in-process and non-durable queuing backend for Active Job.
   # Use inline adapter during asset precompilation
