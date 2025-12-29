@@ -18,7 +18,7 @@
           <ul class="dropdown-menu dropdown-menu-end" aria-labelledby="locationDropdown">
             <% @locations.each do |location| %>
               <li>
-                <%= link_to forecasts_dashboards_path(location_id: location.id), class: "dropdown-item #{'active' if @selected_location&.id == location.id}" do %>
+                <%= link_to forecasts_dashboards_path(location_id: location.id), class: "dropdown-item #{'active' if @selected_location&.id == location.id}", data: { turbo: false } do %>
                   <%= location.name %>
                 <% end %>
               </li>
