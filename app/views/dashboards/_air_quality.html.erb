@@ -4,10 +4,12 @@
       <% air = location.latest_air_quality %>
       <% if air.present? %>
         <div class="col-md-6 mb-3">
-          <div class="card">
+          <div class="card border-success">
             <div class="card-body">
-              <h6><%= location.name %></h6>
-              <div class="mb-2">
+              <h6 class="card-title">
+                <%= location.name %>
+              </h6>
+              <div class="mb-3">
                 <% aqi_color = case air.aqi_level
                                when 1 then "success"
                                when 2 then "info"
@@ -18,30 +20,42 @@
                   AQI <%= air.aqi_level %> - <%= air.aqi_name %>
                 </span>
               </div>
-              <div class="row small">
+              <div class="row mt-3">
                 <div class="col-6">
-                  <small class="text-muted">PM2.5</small>
-                  <div><%= air.pm2_5&.round(1) %> µg/m³</div>
+                  <small class="text-muted d-block">PM2.5</small>
+                  <div class="h6 mb-0">
+                    <%= air.pm2_5&.round(1) %> µg/m³
+                  </div>
                 </div>
                 <div class="col-6">
-                  <small class="text-muted">PM10</small>
-                  <div><%= air.pm10&.round(1) %> µg/m³</div>
+                  <small class="text-muted d-block">PM10</small>
+                  <div class="h6 mb-0">
+                    <%= air.pm10&.round(1) %> µg/m³
+                  </div>
                 </div>
               </div>
-              <div class="row small mt-2">
+              <div class="row mt-3">
                 <div class="col-4">
-                  <small class="text-muted">O3</small>
-                  <div><%= air.o3&.round(1) %></div>
+                  <small class="text-muted d-block">O3</small>
+                  <div class="h6 mb-0"><%= air.o3&.round(1) %></div>
                 </div>
                 <div class="col-4">
-                  <small class="text-muted">NO2</small>
-                  <div><%= air.no2&.round(1) %></div>
+                  <small class="text-muted d-block">NO2</small>
+                  <div class="h6 mb-0"><%= air.no2&.round(1) %></div>
                 </div>
                 <div class="col-4">
-                  <small class="text-muted">SO2</small>
-                  <div><%= air.so2&.round(1) %></div>
+                  <small class="text-muted d-block">SO2</small>
+                  <div class="h6 mb-0"><%= air.so2&.round(1) %></div>
                 </div>
               </div>
+              <% if air.recorded_at.present? %>
+                <div class="mt-2">
+                  <small class="text-muted">
+                    <i class="bi bi-clock-history"></i>
+                    Updated <%= time_ago_in_words(air.recorded_at) %> ago
+                  </small>
+                </div>
+              <% end %>
             </div>
           </div>
         </div>
@@ -49,5 +63,10 @@
     <% end %>
   </div>
 <% else %>
-  <div class="alert alert-info">No air quality data available yet</div>
+  <div class="alert alert-info mb-0">
+    <i class="bi bi-info-circle"></i>
+    <strong>No air quality data available</strong>
+    <p class="mb-0 mt-2">Air quality data will appear here once synchronized.
+    <%= link_to "Sync now", sync_weather_dashboards_path, method: :post, class: "alert-link" %></p>
+  </div>
 <% end %>

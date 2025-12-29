@@ -7,10 +7,10 @@
   <% if history.any? %>
     <div style="height: 400px; position: relative;">
       <%
-        # Prepare data with explicit date labels to prevent Chart.js from parsing as timestamps
+        # Prepare data with full date including year to prevent Chart.js from parsing as 2001
         chart_data = history.map { |h|
-          # Use just the date string without year to avoid timestamp parsing
-          date_label = h.weather_date.strftime('%b %d')
+          # Include year in date format
+          date_label = h.weather_date.strftime('%b %d, %Y')
           [date_label, h.avg_temperature.round(1)]
         }
       %>
@@ -53,11 +53,6 @@
             plugins: {
               legend: {
                 display: false
-              },
-              tooltip: {
-                callbacks: {
-                  title: "function(tooltipItems) { return tooltipItems[0].label; }".html_safe
-                }
               }
             }
           }
@@ -81,7 +76,7 @@
           <tbody>
             <% history.each do |h| %>
               <tr>
-                <td><%= h.weather_date.strftime('%b %d') %></td>
+                <td><%= h.weather_date.strftime('%b %d, %Y') %></td>
                 <td><%= h.max_temperature.round(1) %>&deg;C</td>
                 <td><%= h.min_temperature.round(1) %>&deg;C</td>
                 <td><%= h.avg_temperature.round(1) %>&deg;C</td>

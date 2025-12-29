@@ -9,6 +9,8 @@ Rails.application.configure do
   # Eager load code on boot for better performance and memory savings (ignored by Rake tasks).
   # Disable eager loading during asset precompilation to avoid initializing services
   config.eager_load = ENV['SKIP_REDIS'] != 'true'
+  # Disable eager loading during asset precompilation to avoid initializing services
+  config.eager_load = ENV['SKIP_REDIS'] != 'true'
 
   # Full error reports are disabled.
   config.consider_all_requests_local = false
