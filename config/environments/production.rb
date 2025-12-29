@@ -9,6 +9,8 @@ Rails.application.configure do
   # Eager load code on boot for better performance and memory savings (ignored by Rake tasks).
   # Disable eager loading during asset precompilation to avoid initializing services
   config.eager_load = ENV['SKIP_REDIS'] != 'true'
+  # Disable eager loading during asset precompilation to avoid initializing services
+  config.eager_load = ENV['SKIP_REDIS'] != 'true'
 
   # Full error reports are disabled.
   config.consider_all_requests_local = false
@@ -48,12 +50,14 @@ Rails.application.configure do
   config.active_support.report_deprecations = false
 
   # Replace the default in-process memory cache store with a durable alternative.
-  # Use memory_store during asset precompilation to avoid database connections
-  config.cache_store = ENV['SKIP_REDIS'] == 'true' ? :memory_store : :solid_cache_store
+  # Use memory_store to avoid additional database connections and reduce memory usage
+  # For larger deployments, consider Redis or upgrading Render plan for Solid Cache
+  config.cache_store = :memory_store
 
-  # Replace the default in-process and non-durable queuing backend for Active Job.
-  # Use inline adapter during asset precompilation to avoid Sidekiq initialization
-  config.active_job.queue_adapter = ENV['SKIP_REDIS'] == 'true' ? :inline : :sidekiq
+    # Replace the default in-process and non-durable queuing backend for Active Job.
+  # Use inline adapter during asset precompilation
+  # Solid Queue (PostgreSQL-backed) for production - works on Render free plan without separate worker
+  config.active_job.queue_adapter = ENV['SKIP_REDIS'] == 'true' ? :inline : :solid_queue
 
   # Enable locale fallbacks for I18n (makes lookups for any locale fall back to
   # the I18n.default_locale when a translation cannot be found).

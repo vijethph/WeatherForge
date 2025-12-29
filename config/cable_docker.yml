@@ -1,0 +1,15 @@
+# Docker/Local Development - Redis-based ActionCable
+# This file is used when running with Docker Compose + Sidekiq
+# To use: Set CABLE_CONFIG=cable_docker in your environment
+
+development:
+  adapter: async
+
+test:
+  adapter: test
+
+production:
+  # Redis-based for Docker deployments
+  adapter: redis
+  url: <%= ENV.fetch("REDIS_URL") { "redis://localhost:6379/1" } %>
+  channel_prefix: weatherforge_production

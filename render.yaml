@@ -1,16 +1,15 @@
 services:
-  # Main web application
   - type: web
-    name: weatherforge-web
+    name: weatherforge
     runtime: ruby
     region: oregon
     plan: free
     branch: main
     buildCommand: >
-      bundle install &&
-      bundle exec rake assets:precompile &&
-      bundle exec rake db:migrate
-    startCommand: bundle exec puma -C config/puma.rb
+      SKIP_REDIS=true bundle install &&
+      SKIP_REDIS=true bundle exec rake assets:precompile &&
+      SKIP_REDIS=true bundle exec rake db:migrate
+    startCommand: bash -c 'bin/jobs & bundle exec puma -C config/puma.rb'
     envVars:
       - key: RAILS_ENV
         value: production
@@ -18,12 +17,7 @@ services:
         value: production
       - key: DATABASE_URL
         fromDatabase:
-          name: weatherforge-postgres
-          property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: weatherforge-redis
+          name: common-projects-postgres
           property: connectionString
       - key: RAILS_MASTER_KEY
         sync: false
@@ -34,46 +28,10 @@ services:
     healthCheckPath: /up
     autoDeploy: true
 
-  # Sidekiq background worker
-  - type: worker
-    name: weatherforge-sidekiq
-    runtime: ruby
-    region: oregon
-    plan: free
-    branch: main
-    buildCommand: bundle install
-    startCommand: bundle exec sidekiq -C config/sidekiq.yml
-    envVars:
-      - key: RAILS_ENV
-        value: production
-      - key: DATABASE_URL
-        fromDatabase:
-          name: weatherforge-postgres
-          property: connectionString
-      - key: REDIS_URL
-        fromService:
-          type: redis
-          name: weatherforge-redis
-          property: connectionString
-      - key: RAILS_MASTER_KEY
-        sync: false
-      - key: RAILS_LOG_TO_STDOUT
-        value: "true"
-    autoDeploy: true
-
-  # Redis for Sidekiq and caching
-  - type: redis
-    name: weatherforge-redis
-    region: oregon
-    plan: free
-    maxmemoryPolicy: allkeys-lru
-    ipAllowList: []
-
-# PostgreSQL database
 databases:
-  - name: weatherforge-postgres
+  - name: common-projects-postgres
     region: oregon
     plan: free
-    databaseName: weatherforge_production
-    user: weatherforge
+    databaseName: common_projects_postgres_production
+    user: renderuser
     postgresMajorVersion: "17"

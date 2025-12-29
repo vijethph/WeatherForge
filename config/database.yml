@@ -27,7 +27,6 @@ production:
   encoding: unicode
   pool: <%= ENV.fetch("RAILS_MAX_THREADS") { 5 } %>
   timeout: 5000
-  # Support both DATABASE_URL and individual ENV vars
   url: <%= ENV.fetch("DATABASE_URL", nil) %>
   database: <%= ENV.fetch("DB_NAME", "weather_dashboard_production") %>
   username: <%= ENV.fetch("DB_USER", "postgres") %>

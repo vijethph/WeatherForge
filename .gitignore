@@ -121,4 +121,3 @@ yarn-debug.log*
 *.txt
 **/*.md
 !README.md
-credentials.yml.enc
