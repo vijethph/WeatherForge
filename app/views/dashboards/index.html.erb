@@ -27,14 +27,77 @@
     </div>
   <% else %>
     <!-- Weather Cards -->
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4 mb-5">
       <% @locations.each do |location| %>
         <%= render "dashboards/weather_card", location: location %>
       <% end %>
     </div>
 
+    <!-- Environmental Sensors Section -->
+    <div class="row mt-5 mb-4">
+      <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h2 class="h3">
+            <i class="bi bi-broadcast-pin"></i>
+            Environmental Sensors
+          </h2>
+          <%= link_to environmental_sensors_path, class: "btn btn-outline-primary" do %>
+            <i class="bi bi-map"></i>
+            View All Sensors
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-4 g-4 mb-4">
+      <div class="col">
+        <div class="card text-center h-100">
+          <div class="card-body">
+            <i class="bi bi-broadcast text-primary" style="font-size: 2rem;"></i>
+            <h3 class="mt-2"><%= EnvironmentalSensor.count %></h3>
+            <p class="text-muted mb-0">Total Sensors</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card text-center h-100">
+          <div class="card-body">
+            <i class="bi bi-check-circle text-success" style="font-size: 2rem;"></i>
+            <h3 class="mt-2"><%= EnvironmentalSensor.active.count %></h3>
+            <p class="text-muted mb-0">Active Sensors</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card text-center h-100">
+          <div class="card-body">
+            <i class="bi bi-graph-up text-info" style="font-size: 2rem;"></i>
+            <h3 class="mt-2"><%= EnvironmentalReading.count %></h3>
+            <p class="text-muted mb-0">Total Readings</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="col">
+        <div class="card text-center h-100">
+          <div class="card-body">
+            <i class="bi bi-exclamation-triangle text-warning" style="font-size: 2rem;"></i>
+            <h3 class="mt-2">
+              <span id="environmental_alerts_count"><%= EnvironmentalAlert.active.count %></span>
+            </h3>
+            <p class="text-muted mb-0">
+              <%= link_to "Active Alerts", environmental_alerts_path(status: 'active'), class: "text-decoration-none" %>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- Auto-refresh subscription -->
     <%= turbo_stream_from "location_updates" %>
+    <%= turbo_stream_from "environmental_dashboard" %>
   <% end %>
 </div>
 

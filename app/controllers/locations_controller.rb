@@ -43,8 +43,15 @@ class LocationsController < ApplicationController
   end
 
   def destroy
-    @location.destroy
-    redirect_to dashboards_path, notice: "Location removed successfully"
+    if @location.destroy
+      redirect_to dashboards_path, notice: "Location removed successfully"
+    else
+      Rails.logger.error("Failed to destroy location #{@location.name}: #{@location.errors.full_messages.join(', ')}")
+      redirect_to dashboards_path, alert: "Failed to remove location: #{@location.errors.full_messages.join(', ')}"
+    end
+  rescue StandardError => e
+    Rails.logger.error("Error destroying location #{@location.name}: #{e.message}\n#{e.backtrace.join("\n")}")
+    redirect_to dashboards_path, alert: "Error removing location: #{e.message}"
   end
 
   private

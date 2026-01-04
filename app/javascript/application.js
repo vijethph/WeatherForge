@@ -1,8 +1,11 @@
 // Entry point for the build script in your package.json
+console.log("Application.js loading...");
 import "@hotwired/turbo-rails";
 import "./controllers";
 import "chartkick/chart.js";
 import "chartjs-adapter-date-fns";
+
+console.log("All imports loaded");
 
 // Initialize Chartkick charts
 function initializeCharts() {

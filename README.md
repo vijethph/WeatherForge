@@ -55,17 +55,37 @@
 
 ## About The Project
 
-WeatherForge is a Rails 8.1+ real-time weather dashboard that integrates 7 Open Meteo APIs to provide comprehensive weather monitoring with live updates using Hotwire.
+WeatherForge is a Rails 8.1+ real-time weather dashboard that integrates 7 Open Meteo APIs and OpenAQ API v3 to provide comprehensive weather and environmental monitoring with live updates using Hotwire.
 
 **Key Features:**
+
+**Weather Monitoring:**
 
 - Real-time weather data with automatic 5-minute updates
 - Interactive charts for temperature, humidity, and wind speed trends
 - Hourly forecasts and 10-day historical data
 - Marine weather, air quality, and flood risk monitoring
 - Location search with geocoding
-- Background job processing with Sidekiq
+
+**Environmental Monitoring (GIS Extension):**
+
+- Real-time air quality sensor network with OpenAQ API v3 integration
+- Interactive Leaflet.js maps with sensor markers and clustering
+- Spatial queries for nearby sensors (PostgreSQL/PostGIS)
+- Automated threshold alerts (PM2.5, PM10, O3, NO2, SO2, CO)
+- Health level indicators (Good, Moderate, Unhealthy, Hazardous)
+- Time-series charts for environmental readings
+- CSV export for sensor data
+- GeoJSON API endpoints for custom integrations
+
+**Technical Features:**
+
+- Background job processing with Sidekiq (development) and Solid Queue (production)
+- Turbo Streams for real-time updates without polling
+- Comprehensive RSpec test suite (models, requests, jobs, services)
 - Swagger/OpenAPI documentation at `/api-docs`
+- PostgreSQL 17 with PostGIS 3.5 for spatial queries
+- Leaflet.js 1.9.4 for interactive mapping
 
 |                                Weather Dashboard                                 |                                 Weather Trends                                 |
 | :------------------------------------------------------------------------------: | :----------------------------------------------------------------------------: |
@@ -101,12 +121,76 @@ WeatherForge is a Rails 8.1+ real-time weather dashboard that integrates 7 Open 
   ```sh
   node --version
   ```
-- Docker (for Redis)
+- Docker & Docker Compose (for PostgreSQL with PostGIS and Redis)
   ```sh
   docker --version
+  docker compose version
   ```
 
 ### Installation
+
+#### Option 1: Docker (Recommended for Quick Setup)
+
+1. Clone the repo
+
+   ```sh
+   git clone https://github.com/vijethph/WeatherForge.git
+   cd WeatherForge
+   ```
+
+2. Run setup script
+
+   ```sh
+   bin/docker-setup
+   ```
+
+   The script will configure your environment automatically. Alternatively, manually set up:
+
+   ```sh
+   cp .env.example .env
+   # Get your user ID and group ID
+   id -u  # Add to USER_ID in .env
+   id -g  # Add to GROUP_ID in .env
+   # Add your master key to RAILS_MASTER_KEY in .env
+   ```
+
+3. Build and start all services
+
+   ```sh
+   docker compose build
+   docker compose up -d
+   ```
+
+4. Check logs
+
+   ```sh
+   docker compose logs -f web
+   ```
+
+5. Visit `http://localhost:3000`
+
+**Docker Commands:**
+
+```sh
+# View all logs
+docker compose logs -f
+
+# Rails console
+docker compose exec web bin/rails console
+
+# Run migrations
+docker compose exec web bin/rails db:migrate
+
+# Stop services
+docker compose down
+
+# Clean restart
+docker compose down -v && docker compose up -d --build
+```
+
+See [docs/DOCKER_DEPLOYMENT_GUIDE.md](docs/DOCKER_DEPLOYMENT_GUIDE.md) for detailed instructions and troubleshooting.
+
+#### Option 2: Local Development
 
 1. Clone the repo
 
@@ -122,31 +206,38 @@ WeatherForge is a Rails 8.1+ real-time weather dashboard that integrates 7 Open 
    npm install
    ```
 
-3. Setup database
+3. Setup environment variables
+
+   ```sh
+   cp .env.example .env
+   # Edit .env with your actual values (PostgreSQL credentials, OpenAQ API key, etc.)
+   ```
+
+4. Start database and Redis services
+
+   ```sh
+   docker compose up -d postgres redis
+   ```
+
+5. Setup database (creates and migrates with PostGIS extension)
 
    ```sh
    rails db:setup
    ```
 
-4. Start Redis
-
-   ```sh
-   docker compose up -d redis
-   ```
-
-5. Start the server (starts Rails + JS build watcher)
+6. Start the server (starts Rails + JS build watcher)
 
    ```sh
    bin/dev
    ```
 
-6. Start Sidekiq (in separate terminal)
+7. Start Sidekiq (in separate terminal)
 
    ```sh
    bundle exec sidekiq
    ```
 
-7. Visit `http://localhost:3000`
+8. Visit `http://localhost:3000`
 
 **Additional URLs:**
 
@@ -284,10 +375,25 @@ Project Link: [https://github.com/vijethph/WeatherForge](https://github.com/vije
 
 ## Acknowledgements
 
-- [Open Meteo](https://open-meteo.com/) - Free weather API
-- [Chartkick](https://chartkick.com/) - JavaScript charts for Ruby
-- [Bootstrap](https://getbootstrap.com/) - CSS framework
-- [Sidekiq](https://sidekiq.org/) - Background processing
+**Weather Data:**
+
+- [Open Meteo](https://open-meteo.com/) - Free weather API with multiple endpoints (current, forecast, historical, marine, air quality, flood risk, elevation)
+
+**Environmental Data:**
+
+- [OpenAQ](https://openaq.org/) - Open air quality data platform providing real-time and historical air quality measurements from sensors worldwide via API v3
+
+**Frontend & Visualization:**
+
+- [Chartkick](https://chartkick.com/) - JavaScript charts for Ruby with time-series support
+- [Bootstrap](https://getbootstrap.com/) - CSS framework for responsive design
+- [Leaflet.js](https://leafletjs.com/) - Open-source JavaScript library for interactive maps
+
+**Backend & Infrastructure:**
+
+- [Sidekiq](https://sidekiq.org/) - Background processing for Ruby
+- [PostgreSQL](https://www.postgresql.org/) - Advanced open source database
+- [PostGIS](https://postgis.net/) - Spatial database extension for PostgreSQL
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 

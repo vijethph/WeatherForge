@@ -33,4 +33,47 @@ Rails.application.routes.draw do
       get :search
     end
   end
+
+  # Environmental sensors and monitoring routes
+  resources :environmental_sensors do
+    collection do
+      get :search
+      get :nearby
+      get :map_data
+      post :import_from_openaq
+    end
+
+    member do
+      post :sync
+    end
+
+    # Nested readings for specific sensor
+    resources :environmental_readings, only: [ :index, :create, :destroy ] do
+      collection do
+        get :chartkick
+        get :statistics
+        get :export
+      end
+    end
+  end
+
+  # Environmental readings routes
+  resources :environmental_readings, only: [ :show, :create, :destroy ] do
+    collection do
+      get :latest
+      get :statistics
+    end
+  end
+
+  # Environmental alerts routes
+  resources :environmental_alerts do
+    collection do
+      get :summary
+      get :timeline
+    end
+
+    member do
+      patch :resolve
+    end
+  end
 end

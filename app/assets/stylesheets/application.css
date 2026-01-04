@@ -9,8 +9,6 @@
  * Consider organizing styles into separate files for maintainability.
  */
 
-@import url("dashboard.css");
-
 body {
   min-height: 100vh;
 }

@@ -1,0 +1,92 @@
+<div class="container-fluid mt-4">
+  <%= turbo_stream_from "environmental_alerts" %>
+
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-center">
+        <h1 class="h2">Environmental Alerts</h1>
+        <%= link_to environmental_sensors_path, class: "btn btn-outline-primary" do %>
+          <i class="bi bi-arrow-left"></i>
+          Back to Sensors
+        <% end %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Filter Section -->
+  <div class="row mb-3">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-body">
+          <%= form_with url: environmental_alerts_path, method: :get, class: "row g-3" do |f| %>
+            <div class="col-md-3">
+              <%= f.label :severity, "Severity", class: "form-label" %>
+              <%= f.select :severity,
+                  options_for_select([
+                    ["All Severities", ""],
+                    ["Critical", "critical"],
+                    ["High", "high"],
+                    ["Medium", "medium"],
+                    ["Low", "low"]
+                  ], params[:severity]),
+                  {}, class: "form-select" %>
+            </div>
+
+            <div class="col-md-3">
+              <%= f.label :alert_type, "Alert Type", class: "form-label" %>
+              <%= f.select :alert_type,
+                  options_for_select([
+                    ["All Types", ""],
+                    ["Threshold Exceeded", "threshold_exceeded"],
+                    ["Anomaly", "anomaly"],
+                    ["Sensor Failure", "sensor_failure"],
+                    ["Zone Alert", "zone_alert"]
+                  ], params[:alert_type]),
+                  {}, class: "form-select" %>
+            </div>
+
+            <div class="col-md-3">
+              <%= f.label :status, "Status", class: "form-label" %>
+              <%= f.select :status,
+                  options_for_select([
+                    ["All", ""],
+                    ["Active", "active"],
+                    ["Resolved", "resolved"]
+                  ], params[:status]),
+                  {}, class: "form-select" %>
+            </div>
+
+            <div class="col-md-3 d-flex align-items-end">
+              <%= f.submit "Filter", class: "btn btn-primary me-2" %>
+              <%= link_to "Reset", environmental_alerts_path, class: "btn btn-outline-secondary" %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Alerts List -->
+  <div class="row">
+    <div class="col-12">
+      <div id="alerts_list">
+        <% if @alerts.any? %>
+          <% @alerts.each do |alert| %>
+            <%= render "environmental_alerts/alert", alert: alert %>
+          <% end %>
+
+          <%== pagy_bootstrap_nav(@pagy) if defined?(@pagy) %>
+        <% else %>
+          <div class="card">
+            <div class="card-body">
+              <div class="alert alert-success">
+                <i class="bi bi-check-circle"></i>
+                No alerts found. All systems operating normally!
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+  </div>
+</div>
