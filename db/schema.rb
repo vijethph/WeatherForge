@@ -73,7 +73,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_04_220835) do
 
   create_table "environmental_sensors", force: :cascade do |t|
     t.datetime "created_at", null: false
-    # geom column created via execute statement below
+    t.geometry "geom", limit: {srid: 4326, type: "st_point"}
     t.date "installation_date", null: false
     t.date "last_maintenance"
     t.float "latitude", null: false
@@ -86,6 +86,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_04_220835) do
     t.string "sensor_type", default: "air_quality", null: false
     t.string "status", default: "active", null: false
     t.datetime "updated_at", null: false
+    t.index ["geom"], name: "index_environmental_sensors_on_geom", using: :gist
     t.index ["installation_date"], name: "index_environmental_sensors_on_installation_date"
     t.index ["latitude"], name: "index_environmental_sensors_on_latitude"
     t.index ["location_id", "status"], name: "index_sensors_on_location_and_status"
@@ -96,12 +97,6 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_04_220835) do
     t.index ["sensor_type"], name: "index_environmental_sensors_on_sensor_type"
     t.index ["status"], name: "index_environmental_sensors_on_status"
   end
-
-  # Add PostGIS geometry column to environmental_sensors
-  execute <<-SQL
-    ALTER TABLE environmental_sensors ADD COLUMN IF NOT EXISTS geom geometry(Point, 4326);
-    CREATE INDEX IF NOT EXISTS index_environmental_sensors_on_geom ON environmental_sensors USING GIST (geom);
-  SQL
 
   create_table "flood_risks", force: :cascade do |t|
     t.datetime "created_at", null: false
@@ -151,21 +146,16 @@ ActiveRecord::Schema[8.1].define(version: 2026_01_04_220835) do
     t.datetime "created_at", null: false
     t.text "description"
     t.decimal "elevation", precision: 8, scale: 2
-    # geom column created via execute statement below
+    t.geometry "geom", limit: {srid: 4326, type: "st_point"}
     t.decimal "latitude", precision: 10, scale: 6, null: false
     t.decimal "longitude", precision: 10, scale: 6, null: false
     t.string "name", null: false
     t.string "timezone", default: "UTC"
     t.datetime "updated_at", null: false
+    t.index ["geom"], name: "index_locations_on_geom", using: :gist
     t.index ["latitude", "longitude"], name: "index_locations_on_latitude_and_longitude", unique: true
     t.index ["name"], name: "index_locations_on_name", unique: true
   end
-
-  # Add PostGIS geometry column to locations
-  execute <<-SQL
-    ALTER TABLE locations ADD COLUMN IF NOT EXISTS geom geometry(Point, 4326);
-    CREATE INDEX IF NOT EXISTS index_locations_on_geom ON locations USING GIST (geom);
-  SQL
 
   create_table "marine_weathers", force: :cascade do |t|
     t.datetime "created_at", null: false

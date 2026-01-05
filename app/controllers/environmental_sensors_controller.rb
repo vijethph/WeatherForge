@@ -85,14 +85,20 @@ class EnvironmentalSensorsController < ApplicationController
     respond_to do |format|
       format.html
       format.json do
-        render json: @sensor.as_json(
+        sensor_json = @sensor.as_json(
           include: {
-            location: { only: [ :id, :name, :latitude, :longitude, :timezone, :country ] },
-            recent_readings: { methods: :health_level },
-            active_alerts: {}
+            location: { only: [ :id, :name, :latitude, :longitude, :timezone, :country ] }
           },
-          methods: [ :distance_to ]
+          methods: [ :latest_reading ]
         )
+
+        # Add limited readings manually
+        sensor_json["latest_reading"] = @sensor.latest_reading&.as_json(
+          only: [ :id, :parameter_name, :value, :unit, :recorded_at ],
+          methods: :health_level
+        )
+
+        render json: sensor_json
       end
     end
   end
@@ -103,9 +109,6 @@ class EnvironmentalSensorsController < ApplicationController
     @sensor = EnvironmentalSensor.new(sensor_params)
 
     if @sensor.save
-      # Update geometry from coordinates if not present
-      @sensor.update_geom_from_coordinates unless @sensor.geom.present?
-
       respond_to do |format|
         format.html { redirect_to @sensor, notice: "Sensor created successfully" }
         format.json { render json: @sensor, status: :created }
@@ -113,8 +116,14 @@ class EnvironmentalSensorsController < ApplicationController
     else
       respond_to do |format|
         format.html { render :new, status: :unprocessable_entity }
-        format.json { render json: @sensor.errors, status: :unprocessable_entity }
+        format.json { render json: { errors: @sensor.errors }, status: :unprocessable_entity }
       end
+    end
+  rescue StandardError => e
+    Rails.logger.error "Failed to create sensor: #{e.message}\n#{e.backtrace.join("\n")}"
+    respond_to do |format|
+      format.html { redirect_to environmental_sensors_path, alert: "Failed to create sensor: #{e.message}" }
+      format.json { render json: { error: e.message }, status: :unprocessable_entity }
     end
   end
 
@@ -301,6 +310,12 @@ class EnvironmentalSensorsController < ApplicationController
     sensors = sensors.where(sensor_type: params[:sensor_type]) if params[:sensor_type].present?
     sensors = sensors.where(status: params[:status]) if params[:status].present?
     sensors = sensors.where(location_id: params[:location_id]) if params[:location_id].present?
+
+    # Text search filter by name or manufacturer
+    if params[:query].present?
+      query = "%#{params[:query]}%"
+      sensors = sensors.where("name ILIKE ? OR manufacturer ILIKE ?", query, query)
+    end
 
     # Spatial filter: near coordinates
     if params[:near_lat].present? && params[:near_lon].present?

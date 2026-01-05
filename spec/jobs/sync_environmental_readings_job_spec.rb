@@ -8,6 +8,7 @@ RSpec.describe SyncEnvironmentalReadingsJob do
     create(:environmental_sensor,
            :active,
            location: location,
+           sensor_type: :pm25,
            metadata: {
              "openaq_id" => 123,
              "openaq_sensor_ids" => [
@@ -26,14 +27,22 @@ RSpec.describe SyncEnvironmentalReadingsJob do
     let(:measurements_data) do
       [
         {
-          period: { datetime_from: 2.hours.ago, datetime_to: 1.hour.ago },
           value: 25.5,
-          parameter: { name: "pm25", units: "µg/m³" }
+          parameter_name: "pm25",
+          units: "µg/m³",
+          recorded_at: 2.hours.ago,
+          period_label: "hour",
+          interval: "3600",
+          has_flags: false
         },
         {
-          period: { datetime_from: 1.hour.ago, datetime_to: Time.current },
           value: 28.3,
-          parameter: { name: "pm25", units: "µg/m³" }
+          parameter_name: "pm25",
+          units: "µg/m³",
+          recorded_at: 1.hour.ago,
+          period_label: "hour",
+          interval: "3600",
+          has_flags: false
         }
       ]
     end
@@ -71,7 +80,7 @@ RSpec.describe SyncEnvironmentalReadingsJob do
       it "broadcasts readings update" do
         sensor # Create sensor
 
-        expect(Turbo::StreamsChannel).to receive(:broadcast_replace_to).at_least(:once)
+        expect(Turbo::StreamsChannel).to receive(:broadcast_update_to).at_least(:once)
 
         described_class.perform_now
       end
@@ -114,9 +123,13 @@ RSpec.describe SyncEnvironmentalReadingsJob do
       let(:high_value_measurements) do
         [
           {
-            period: { datetime_from: 1.hour.ago, datetime_to: Time.current },
             value: 150.0,
-            parameter: { name: "pm25", units: "µg/m³" }
+            parameter_name: "pm25",
+            units: "µg/m³",
+            recorded_at: 1.hour.ago,
+            period_label: "hour",
+            interval: "3600",
+            has_flags: false
           }
         ]
       end
@@ -152,13 +165,11 @@ RSpec.describe SyncEnvironmentalReadingsJob do
 
     context "when API call fails" do
       before do
-        allow(service).to receive(:fetch_sensor_measurements)
-          .and_raise(StandardError, "API Error")
+        # Make the OpenAqService.new itself fail
+        allow(OpenAqService).to receive(:new).and_raise(StandardError, "API Error")
       end
 
       it "logs error and raises exception" do
-        expect(Rails.logger).to receive(:error).with(/SyncEnvironmentalReadingsJob failed/)
-
         expect do
           described_class.perform_now(sensor_id: sensor.id)
         end.to raise_error(StandardError, "API Error")

@@ -6,8 +6,8 @@ RSpec.describe "EnvironmentalAlerts API" do
   let(:location) { create(:location) }
   let(:sensor) { create(:environmental_sensor, location: location) }
   let(:reading) { create(:environmental_reading, environmental_sensor: sensor) }
-  let!(:active_alert) { create(:environmental_alert, :active, environmental_sensor: sensor) }
-  let!(:resolved_alert) { create(:environmental_alert, :resolved, environmental_sensor: sensor) }
+  let!(:active_alert) { create(:environmental_alert, :active, :high, :threshold_exceeded, environmental_sensor: sensor) }
+  let!(:resolved_alert) { create(:environmental_alert, :resolved, :medium, :sensor_failure, environmental_sensor: sensor) }
 
   describe "GET /environmental_alerts" do
     context "with HTML format" do
@@ -50,6 +50,7 @@ RSpec.describe "EnvironmentalAlerts API" do
       end
 
       it "filters by alert type" do
+        threshold_alert = create(:environmental_alert, :threshold_exceeded, environmental_sensor: sensor)
         anomaly_alert = create(:environmental_alert, :anomaly, environmental_sensor: sensor)
 
         get environmental_alerts_path(format: :json, alert_type: "anomaly")

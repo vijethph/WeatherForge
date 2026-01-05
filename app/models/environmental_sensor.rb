@@ -137,7 +137,7 @@ class EnvironmentalSensor < ApplicationRecord
   # Update PostGIS geometry field from latitude/longitude coordinates
   # Called from controllers and jobs when importing/updating sensors
   def update_geom_from_coordinates
-    if latitude.present? && longitude.present?
+    if latitude.present? && longitude.present? && valid_coordinates?
       self.geom = "POINT(#{longitude} #{latitude})"
     end
   end
@@ -146,6 +146,10 @@ class EnvironmentalSensor < ApplicationRecord
 
   def coordinates_changed?
     latitude_changed? || longitude_changed?
+  end
+
+  def valid_coordinates?
+    latitude.between?(-90, 90) && longitude.between?(-180, 180)
   end
 
   def coordinates_must_be_present_or_location_exists

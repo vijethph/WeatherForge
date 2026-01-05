@@ -67,7 +67,7 @@ class EnvironmentalReadingsController < ApplicationController
 
     if @reading.save
       respond_to do |format|
-        format.html { redirect_to environmental_sensor_readings_path(@sensor), notice: "Reading created successfully" }
+        format.html { redirect_to environmental_sensor_environmental_readings_path(@sensor), notice: "Reading created successfully" }
         format.json { render json: @reading, status: :created }
       end
     else
@@ -126,8 +126,9 @@ class EnvironmentalReadingsController < ApplicationController
   private
 
   def set_sensor
-    if params[:sensor_id].present?
-      @sensor = EnvironmentalSensor.find_by(id: params[:sensor_id])
+    sensor_id_param = params[:environmental_sensor_id] || params[:sensor_id]
+    if sensor_id_param.present?
+      @sensor = EnvironmentalSensor.find_by(id: sensor_id_param)
     end
   end
 

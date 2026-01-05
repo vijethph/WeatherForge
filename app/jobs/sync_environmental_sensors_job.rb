@@ -157,6 +157,7 @@ class SyncEnvironmentalSensorsJob < ApplicationJob
   def build_sensor_metadata(sensor_data)
     {
       openaq_id: sensor_data[:openaq_id],
+      provider: sensor_data[:provider],
       locality: sensor_data[:locality],
       country: sensor_data[:country],
       country_code: sensor_data[:country_code],

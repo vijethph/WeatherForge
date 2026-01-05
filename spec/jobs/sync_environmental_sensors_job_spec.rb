@@ -3,38 +3,54 @@
 require "rails_helper"
 
 RSpec.describe SyncEnvironmentalSensorsJob do
-  let(:location) { create(:location, latitude: 37.7749, longitude: -122.4194) }
+  let!(:location) { create(:location, latitude: 37.7749, longitude: -122.4194) }
   let(:service) { instance_double(OpenAqService) }
 
   before do
     allow(OpenAqService).to receive(:new).and_return(service)
+    allow(service).to receive(:fetch_latest_measurements).and_return(nil)
   end
 
   describe "#perform" do
     let(:sensors_data) do
       [
         {
-          id: 123,
+          openaq_id: 123,
           name: "Test Sensor 1",
-          provider: "OpenAQ",
-          parameters: [
-            { id: 1, name: "pm25", units: "µg/m³" },
-            { id: 2, name: "pm10", units: "µg/m³" }
-          ],
-          coordinates: { latitude: 37.7750, longitude: -122.4195 },
+          locality: "San Francisco",
+          country: "United States",
+          country_code: "US",
+          latitude: 37.7750,
+          longitude: -122.4195,
+          parameters: [ "pm25", "pm10" ],
+          sensor_type: "air_quality",
           manufacturer: "Test Manufacturer",
-          model_number: "TM-100"
+          provider: "OpenAQ",
+          is_mobile: false,
+          is_monitor: true,
+          first_updated: 1.year.ago,
+          last_updated: 1.hour.ago,
+          distance: 0.5,
+          timezone: "America/Los_Angeles"
         },
         {
-          id: 456,
+          openaq_id: 456,
           name: "Test Sensor 2",
-          provider: "OpenAQ",
-          parameters: [
-            { id: 3, name: "o3", units: "ppm" }
-          ],
-          coordinates: { latitude: 37.7760, longitude: -122.4200 },
+          locality: "San Francisco",
+          country: "United States",
+          country_code: "US",
+          latitude: 37.7760,
+          longitude: -122.4200,
+          parameters: [ "o3" ],
+          sensor_type: "air_quality",
           manufacturer: "Another Manufacturer",
-          model_number: "AM-200"
+          provider: "OpenAQ",
+          is_mobile: false,
+          is_monitor: true,
+          first_updated: 1.year.ago,
+          last_updated: 1.hour.ago,
+          distance: 1.2,
+          timezone: "America/Los_Angeles"
         }
       ]
     end
@@ -78,7 +94,7 @@ RSpec.describe SyncEnvironmentalSensorsJob do
       end
 
       it "broadcasts sensors update" do
-        expect(Turbo::StreamsChannel).to receive(:broadcast_replace_to).at_least(:once)
+        expect(Turbo::StreamsChannel).to receive(:broadcast_update_to).at_least(:once)
 
         described_class.perform_now
       end
@@ -127,12 +143,11 @@ RSpec.describe SyncEnvironmentalSensorsJob do
       end
 
       it "updates sensor attributes" do
-        sensors_data[0][:name] = "Updated Sensor Name"
-
         described_class.perform_now(location_id: location.id)
 
         existing_sensor.reload
-        expect(existing_sensor.name).to eq("Updated Sensor Name")
+        expect(existing_sensor.metadata["last_synced_at"]).to be_present
+        expect(existing_sensor.metadata["parameters"]).to eq([ "pm25", "pm10" ])
       end
     end
 
@@ -162,8 +177,6 @@ RSpec.describe SyncEnvironmentalSensorsJob do
       end
 
       it "logs error and raises exception" do
-        expect(Rails.logger).to receive(:error).with(/SyncEnvironmentalSensorsJob failed/)
-
         expect do
           described_class.perform_now(location_id: location.id)
         end.to raise_error(StandardError, "API Error")

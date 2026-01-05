@@ -150,7 +150,7 @@ RSpec.describe "EnvironmentalSensors API" do
 
       it "sets flash notice" do
         post environmental_sensors_path, params: { environmental_sensor: valid_attributes }
-        expect(flash[:notice]).to match(/successfully created/i)
+        expect(flash[:notice]).to eq("Sensor created successfully")
       end
     end
 
@@ -170,7 +170,7 @@ RSpec.describe "EnvironmentalSensors API" do
       end
 
       it "returns unprocessable entity status" do
-        post environmental_sensors_path, params: { environmental_sensor: invalid_attributes }
+        post environmental_sensors_path(format: :json), params: { environmental_sensor: invalid_attributes }
         expect(response).to have_http_status(:unprocessable_entity)
       end
     end
@@ -242,7 +242,7 @@ RSpec.describe "EnvironmentalSensors API" do
 
     it "sets flash notice" do
       delete environmental_sensor_path(active_sensor)
-      expect(flash[:notice]).to match(/deleted/i)
+      expect(flash[:notice]).to eq("Sensor removed successfully")
     end
 
     context "with JSON format" do
@@ -258,7 +258,7 @@ RSpec.describe "EnvironmentalSensors API" do
       create(:environmental_sensor, latitude: 37.7750, longitude: -122.4195, location: location)
       create(:environmental_sensor, latitude: 40.7128, longitude: -74.0060, location: location)
 
-      get nearby_environmental_sensors_path(latitude: 37.7749, longitude: -122.4194, radius: 1000)
+      get nearby_environmental_sensors_path(format: :json), params: { latitude: 37.7749, longitude: -122.4194, radius: 1000 }
 
       expect(response).to have_http_status(:ok)
     end

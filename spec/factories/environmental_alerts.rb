@@ -43,5 +43,20 @@ FactoryBot.define do
       alert_type { "anomaly" }
       message { "Anomalous reading detected" }
     end
+
+    trait :sensor_failure do
+      alert_type { "sensor_failure" }
+      message { "Sensor malfunction detected" }
+    end
+
+    trait :network_issue do
+      alert_type { "network_issue" }
+      message { "Network connectivity issue" }
+    end
+
+    trait :zone_alert do
+      alert_type { "zone_alert" }
+      message { "Zone threshold violation" }
+    end
   end
 end
