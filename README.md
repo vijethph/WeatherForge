@@ -2,11 +2,14 @@
 
 <!-- PROJECT SHIELDS -->
 
-[![Contributors][contributors-shield]][contributors-url]
-[![Forks][forks-shield]][forks-url]
-[![Stargazers][stars-shield]][stars-url]
-[![Issues][issues-shield]][issues-url]
-[![Apache License][license-shield]][license-url]
+[![Status](https://img.shields.io/badge/status-active-success.svg?style=flat-square&logo=ruby)]()
+[![GitHub issues](https://img.shields.io/github/issues/vijethph/WeatherForge?style=flat-square)](https://github.com/vijethph/WeatherForge/issues)
+[![Contributors](https://img.shields.io/github/contributors/vijethph/WeatherForge?style=flat-square)](https://github.com/vijethph/WeatherForge/graphs/contributors)
+[![GitHub forks](https://img.shields.io/github/forks/vijethph/WeatherForge?color=blue&style=flat-square)](https://github.com/vijethph/WeatherForge/network)
+[![GitHub stars](https://img.shields.io/github/stars/vijethph/WeatherForge?color=yellow&style=flat-square)](https://github.com/vijethph/WeatherForge/stargazers)
+[![GitHub license](https://img.shields.io/github/license/vijethph/WeatherForge?style=flat-square)](https://github.com/vijethph/WeatherForge/blob/master/LICENSE)
+[![forthebadge](https://forthebadge.com/images/badges/made-with-ruby.svg)](https://forthebadge.com)
+[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/vijethph/WeatherForge)
 
 <!-- PROJECT LOGO -->
 <br />
@@ -18,7 +21,7 @@
   <h3 align="center">WeatherForge</h3>
 
   <p align="center">
-    Advanced real-time weather dashboard with environmental monitoring
+    A real-time weather dashboard with environmental monitoring
     <br />
     <a href="https://github.com/vijethph/WeatherForge/issues">Report Bug</a>
     ·
@@ -84,18 +87,6 @@ WeatherForge is a Rails 8.1+ advanced real-time weather dashboard that integrate
 - GeoJSON API endpoints for custom map integrations
 - Alert resolution tracking with timestamps and notes
 
-**Technical Features:**
-
-- **Background Jobs:** Sidekiq (development/Docker) and Solid Queue (production)
-- **Real-time Updates:** Turbo Streams via Action Cable
-- **Testing:** Comprehensive RSpec test suite (models, requests, jobs, services)
-- **API Documentation:** Swagger/OpenAPI 3.0.1 at `/api-docs`
-- **Database:** PostgreSQL 17 with PostGIS 3.5 for spatial queries
-- **Mapping:** Leaflet.js 1.9.4 with marker clustering
-- **Charts:** Chartkick with Chart.js
-- **Styling:** Bootstrap 5.3 with responsive design
-- **CI/CD:** GitHub Actions for testing and deployment
-
 |                                Weather Dashboard                                 |                                 Weather Trends                                 |
 | :------------------------------------------------------------------------------: | :----------------------------------------------------------------------------: |
 | <img src="screenshots/weatherforge1.png" alt="Weather Dashboard" height="400" /> | <img src="screenshots/weatherforge2.png" alt="Weather Trends" height="400"  /> |
@@ -105,8 +96,8 @@ WeatherForge is a Rails 8.1+ advanced real-time weather dashboard that integrate
 | <img src="screenshots/weatherforge3.png" alt="Weather Forecasts" height="500" /> | <img src="screenshots/weatherforge4.png" alt="Environmental Data" height="500"  /> |
 
 |                                Sensors Dashboard                                 |                                Environmental Alerts                                 |
-| :------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------: | --- |
-| <img src="screenshots/weatherforge5.png" alt="Sensors Dashboard" height="400" /> | <img src="screenshots/weatherforge6.png" alt="Environmental Alerts" height="400" /> |     |
+| :------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------: |
+| <img src="screenshots/weatherforge5.png" alt="Sensors Dashboard" height="400" /> | <img src="screenshots/weatherforge6.png" alt="Environmental Alerts" height="400" /> |
 
 |                                Alert Details                                 |                                Sensor Details                                 |
 | :--------------------------------------------------------------------------: | :---------------------------------------------------------------------------: |
