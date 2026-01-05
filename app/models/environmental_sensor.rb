@@ -118,12 +118,16 @@ class EnvironmentalSensor < ApplicationRecord
     return nil unless has_geom? && other_sensor.has_geom?
 
     if self.class.connection.adapter_name.downcase.include?("postgis")
-      result = self.class.connection.execute(
-        "SELECT ST_Distance(
-          '#{geom.as_text}'::geography,
-          '#{other_sensor.geom.as_text}'::geography
-        ) as distance"
-      ).first
+      result = self.class.connection.select_one(
+        self.class.sanitize_sql_array([
+          "SELECT ST_Distance(
+            ST_GeomFromText(?, 4326)::geography,
+            ST_GeomFromText(?, 4326)::geography
+          ) as distance",
+          geom.as_text,
+          other_sensor.geom.as_text
+        ])
+      )
       (result["distance"].to_f / 1000.0).round(2)
     else
       haversine_distance(other_sensor)

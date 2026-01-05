@@ -27,8 +27,10 @@ class Location < ApplicationRecord
   scope :near_point, lambda { |lat, lng, radius_km = 10|
     if connection.adapter_name.downcase.include?("postgis")
       # PostGIS spatial query (accurate, works on sphere)
-      point = "ST_SetSRID(ST_MakePoint(#{lng}, #{lat}), 4326)"
-      where("ST_DWithin(geom, #{point}::geography, ?)", radius_km * 1000)
+      where(
+        "ST_DWithin(geom, ST_SetSRID(ST_MakePoint(?, ?), 4326)::geography, ?)",
+        lng, lat, radius_km * 1000
+      )
     else
       # Fallback for non-PostGIS databases (less accurate, uses flat approximation)
       lat_delta = radius_km / 111.0
@@ -133,12 +135,16 @@ class Location < ApplicationRecord
 
     if self.class.connection.adapter_name.downcase.include?("postgis")
       # Use PostGIS ST_Distance (returns meters)
-      result = self.class.connection.execute(
-        "SELECT ST_Distance(
-          '#{geom.as_text}'::geography,
-          '#{other_location.geom.as_text}'::geography
-        ) as distance"
-      ).first
+      result = self.class.connection.select_one(
+        self.class.sanitize_sql_array([
+          "SELECT ST_Distance(
+            ST_GeomFromText(?, 4326)::geography,
+            ST_GeomFromText(?, 4326)::geography
+          ) as distance",
+          geom.as_text,
+          other_location.geom.as_text
+        ])
+      )
       (result["distance"].to_f / 1000.0).round(2)
     else
       # Haversine formula fallback

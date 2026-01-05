@@ -1,14 +1,15 @@
-[![Status](https://img.shields.io/badge/status-active-success.svg?style=flat-square&logo=ruby)]()
-[![GitHub issues](https://img.shields.io/github/issues/vijethph/WeatherForge?style=flat-square)](https://github.com/vijethph/WeatherForge/issues)
-[![Contributors](https://img.shields.io/github/contributors/vijethph/WeatherForge?style=flat-square)](https://github.com/vijethph/WeatherForge/graphs/contributors)
-[![GitHub forks](https://img.shields.io/github/forks/vijethph/WeatherForge?color=blue&style=flat-square)](https://github.com/vijethph/WeatherForge/network)
-[![GitHub stars](https://img.shields.io/github/stars/vijethph/WeatherForge?color=yellow&style=flat-square)](https://github.com/vijethph/WeatherForge/stargazers)
-[![GitHub license](https://img.shields.io/github/license/vijethph/WeatherForge?style=flat-square)](https://github.com/vijethph/WeatherForge/blob/master/LICENSE)
-[![forthebadge](https://forthebadge.com/images/badges/made-with-ruby.svg)](https://forthebadge.com)
-[![Deploy to Render](https://render.com/images/deploy-to-render-button.svg)](https://render.com/deploy?repo=https://github.com/vijethph/WeatherForge)
+<a name="readme-top"></a>
 
-<br/>
+<!-- PROJECT SHIELDS -->
 
+[![Contributors][contributors-shield]][contributors-url]
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
+[![Apache License][license-shield]][license-url]
+
+<!-- PROJECT LOGO -->
+<br />
 <div align="center">
   <a href="https://github.com/vijethph/WeatherForge">
     <img src="public/icon.png" alt="Logo" width="80" height="80">
@@ -17,7 +18,7 @@
   <h3 align="center">WeatherForge</h3>
 
   <p align="center">
-    A real-time weather dashboard
+    Advanced real-time weather dashboard with environmental monitoring
     <br />
     <a href="https://github.com/vijethph/WeatherForge/issues">Report Bug</a>
     ·
@@ -32,6 +33,7 @@
     <li>
       <a href="#about-the-project">About The Project</a>
       <ul>
+        <li><a href="#key-features">Key Features</a></li>
         <li><a href="#built-with">Built With</a></li>
       </ul>
     </li>
@@ -43,6 +45,7 @@
       </ul>
     </li>
     <li><a href="#usage">Usage</a></li>
+    <li><a href="#roadmap">Roadmap</a></li>
     <li><a href="#deployment">Deployment</a></li>
     <li><a href="#contributing">Contributing</a></li>
     <li><a href="#license">License</a></li>
@@ -55,37 +58,43 @@
 
 ## About The Project
 
-WeatherForge is a Rails 8.1+ real-time weather dashboard that integrates 7 Open Meteo APIs and OpenAQ API v3 to provide comprehensive weather and environmental monitoring with live updates using Hotwire.
+WeatherForge is a Rails 8.1+ advanced real-time weather dashboard that integrates multiple Open Meteo APIs and OpenAQ API v3 to provide comprehensive weather data, forecasts, marine conditions, air quality, flood risk information, and environmental monitoring with live updates using Hotwire (Turbo + Stimulus).
 
-**Key Features:**
+### Key Features
 
 **Weather Monitoring:**
 
-- Real-time weather data with automatic 5-minute updates
-- Interactive charts for temperature, humidity, and wind speed trends
-- Hourly forecasts and 10-day historical data
-- Marine weather, air quality, and flood risk monitoring
-- Location search with geocoding
+- Real-time weather data with automatic 5-minute updates via background jobs
+- Interactive Chartkick charts for temperature, humidity, and wind speed trends
+- 24-hour forecasts and 10-day historical weather data
+- Marine weather conditions (wave height, period, water temperature)
+- Air quality monitoring (PM2.5, PM10, O3, NO2, SO2) with AQI levels
+- Flood risk assessment with severity indicators
+- Location search with geocoding via Open Meteo API
+- Turbo Streams for real-time updates without polling
 
 **Environmental Monitoring (GIS Extension):**
 
 - Real-time air quality sensor network with OpenAQ API v3 integration
 - Interactive Leaflet.js maps with sensor markers and clustering
-- Spatial queries for nearby sensors (PostgreSQL/PostGIS)
+- PostgreSQL/PostGIS spatial queries for nearby sensors (ST_DWithin)
 - Automated threshold alerts (PM2.5, PM10, O3, NO2, SO2, CO)
-- Health level indicators (Good, Moderate, Unhealthy, Hazardous)
-- Time-series charts for environmental readings
-- CSV export for sensor data
-- GeoJSON API endpoints for custom integrations
+- Health level indicators (Good, Moderate, Unhealthy for Sensitive Groups, Unhealthy, Very Unhealthy, Hazardous)
+- Time-series charts for 24-hour environmental readings
+- GeoJSON API endpoints for custom map integrations
+- Alert resolution tracking with timestamps and notes
 
 **Technical Features:**
 
-- Background job processing with Sidekiq (development) and Solid Queue (production)
-- Turbo Streams for real-time updates without polling
-- Comprehensive RSpec test suite (models, requests, jobs, services)
-- Swagger/OpenAPI documentation at `/api-docs`
-- PostgreSQL 17 with PostGIS 3.5 for spatial queries
-- Leaflet.js 1.9.4 for interactive mapping
+- **Background Jobs:** Sidekiq (development/Docker) and Solid Queue (production)
+- **Real-time Updates:** Turbo Streams via Action Cable
+- **Testing:** Comprehensive RSpec test suite (models, requests, jobs, services)
+- **API Documentation:** Swagger/OpenAPI 3.0.1 at `/api-docs`
+- **Database:** PostgreSQL 17 with PostGIS 3.5 for spatial queries
+- **Mapping:** Leaflet.js 1.9.4 with marker clustering
+- **Charts:** Chartkick with Chart.js
+- **Styling:** Bootstrap 5.3 with responsive design
+- **CI/CD:** GitHub Actions for testing and deployment
 
 |                                Weather Dashboard                                 |                                 Weather Trends                                 |
 | :------------------------------------------------------------------------------: | :----------------------------------------------------------------------------: |
@@ -94,6 +103,14 @@ WeatherForge is a Rails 8.1+ real-time weather dashboard that integrates 7 Open 
 |                                Weather Forecasts                                 |                                 Environmental Data                                 |
 | :------------------------------------------------------------------------------: | :--------------------------------------------------------------------------------: |
 | <img src="screenshots/weatherforge3.png" alt="Weather Forecasts" height="500" /> | <img src="screenshots/weatherforge4.png" alt="Environmental Data" height="500"  /> |
+
+|                                Sensors Dashboard                                 |                                Environmental Alerts                                 |
+| :------------------------------------------------------------------------------: | :---------------------------------------------------------------------------------: | --- |
+| <img src="screenshots/weatherforge5.png" alt="Sensors Dashboard" height="400" /> | <img src="screenshots/weatherforge6.png" alt="Environmental Alerts" height="400" /> |     |
+
+|                                Alert Details                                 |                                Sensor Details                                 |
+| :--------------------------------------------------------------------------: | :---------------------------------------------------------------------------: |
+| <img src="screenshots/weatherforge7.png" alt="Alert Details" height="300" /> | <img src="screenshots/weatherforge8.png" alt="Sensor Details" height="600" /> |
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -187,8 +204,6 @@ docker compose down
 # Clean restart
 docker compose down -v && docker compose up -d --build
 ```
-
-See [docs/DOCKER_DEPLOYMENT_GUIDE.md](docs/DOCKER_DEPLOYMENT_GUIDE.md) for detailed instructions and troubleshooting.
 
 #### Option 2: Local Development
 
@@ -371,29 +386,18 @@ Project Link: [https://github.com/vijethph/WeatherForge](https://github.com/vije
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
-<!-- ACKNOWLEDGMENTS -->
+<!-- ACKNOWLEDGEMENTS -->
 
 ## Acknowledgements
 
-**Weather Data:**
-
-- [Open Meteo](https://open-meteo.com/) - Free weather API with multiple endpoints (current, forecast, historical, marine, air quality, flood risk, elevation)
-
-**Environmental Data:**
-
-- [OpenAQ](https://openaq.org/) - Open air quality data platform providing real-time and historical air quality measurements from sensors worldwide via API v3
-
-**Frontend & Visualization:**
-
-- [Chartkick](https://chartkick.com/) - JavaScript charts for Ruby with time-series support
-- [Bootstrap](https://getbootstrap.com/) - CSS framework for responsive design
-- [Leaflet.js](https://leafletjs.com/) - Open-source JavaScript library for interactive maps
-
-**Backend & Infrastructure:**
-
-- [Sidekiq](https://sidekiq.org/) - Background processing for Ruby
-- [PostgreSQL](https://www.postgresql.org/) - Advanced open source database
-- [PostGIS](https://postgis.net/) - Spatial database extension for PostgreSQL
+- [Open Meteo](https://open-meteo.com/)
+- [OpenAQ](https://openaq.org/)
+- [Chartkick](https://chartkick.com/)
+- [Bootstrap](https://getbootstrap.com/)
+- [Leaflet.js](https://leafletjs.com/)
+- [Sidekiq](https://sidekiq.org/)
+- [PostgreSQL](https://www.postgresql.org/)
+- [PostGIS](https://postgis.net/)
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
