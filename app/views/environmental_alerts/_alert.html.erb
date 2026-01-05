@@ -31,12 +31,13 @@
           | Resolved <%= time_ago_in_words(alert.resolved_at) %> ago
         <% end %>
       </small>
-      <div>
-        <%= link_to "View Details", environmental_alert_path(alert), class: "btn btn-sm btn-outline-primary me-2" %>
+      <div class="d-flex gap-2">
+        <%= link_to "View Details", environmental_alert_path(alert), class: "btn btn-sm btn-outline-primary" %>
         <% unless alert.resolved_at %>
           <%= button_to "Resolve", resolve_environmental_alert_path(alert),
               method: :patch,
               class: "btn btn-sm btn-success",
+              form: { style: "display: inline-block;" },
               data: { turbo_confirm: "Mark this alert as resolved?" } %>
         <% end %>
       </div>

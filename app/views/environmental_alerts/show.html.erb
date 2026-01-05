@@ -24,57 +24,70 @@
         <div class="card-body">
           <h5 class="card-title">Alert Details</h5>
 
-          <dl class="row">
-            <dt class="col-sm-3">Alert Type</dt>
-            <dd class="col-sm-9"><%= @alert.alert_type.humanize %></dd>
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+              <tbody>
+                <tr>
+                  <th style="width: 25%;">Alert Type</th>
+                  <td><%= @alert.alert_type.humanize %></td>
+                </tr>
+                <tr>
+                  <th>Severity</th>
+                  <td>
+                    <span class="badge bg-<%= @alert.severity_color %>"><%= @alert.severity.upcase %></span>
+                  </td>
+                </tr>
+                <tr>
+                  <th>Status</th>
+                  <td>
+                    <% if @alert.resolved_at %>
+                      <span class="badge bg-success">RESOLVED</span>
+                    <% else %>
+                      <span class="badge bg-danger">ACTIVE</span>
+                    <% end %>
+                  </td>
+                </tr>
+                <tr>
+                  <th>Sensor</th>
+                  <td>
+                    <%= link_to @alert.environmental_sensor.name, environmental_sensor_path(@alert.environmental_sensor) %>
+                  </td>
+                </tr>
+                <tr>
+                  <th>Message</th>
+                  <td><%= @alert.message %></td>
+                </tr>
+                <tr>
+                  <th>Created At</th>
+                  <td>
+                    <%= @alert.created_at.strftime("%B %d, %Y at %I:%M %p") %>
+                    (<%= time_ago_in_words(@alert.created_at) %> ago)
+                  </td>
+                </tr>
+                <% if @alert.resolved_at %>
+                  <tr>
+                    <th>Resolved At</th>
+                    <td>
+                      <%= @alert.resolved_at.strftime("%B %d, %Y at %I:%M %p") %>
+                      (<%= time_ago_in_words(@alert.resolved_at) %> ago)
+                    </td>
+                  </tr>
+                <% end %>
+                <% if @alert.environmental_reading %>
+                  <tr>
+                    <th>Related Reading</th>
+                    <td>
+                      Value: <%= @alert.environmental_reading.value %> <%= @alert.environmental_reading.unit %>
+                      at <%= @alert.environmental_reading.recorded_at.strftime("%B %d, %Y %I:%M %p") %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
 
-            <dt class="col-sm-3">Severity</dt>
-            <dd class="col-sm-9">
-              <span class="badge bg-<%= @alert.severity_color %>"><%= @alert.severity.upcase %></span>
-            </dd>
-
-            <dt class="col-sm-3">Status</dt>
-            <dd class="col-sm-9">
-              <% if @alert.resolved_at %>
-                <span class="badge bg-success">RESOLVED</span>
-              <% else %>
-                <span class="badge bg-danger">ACTIVE</span>
-              <% end %>
-            </dd>
-
-            <dt class="col-sm-3">Sensor</dt>
-            <dd class="col-sm-9">
-              <%= link_to @alert.environmental_sensor.name, environmental_sensor_path(@alert.environmental_sensor) %>
-            </dd>
-
-            <dt class="col-sm-3">Message</dt>
-            <dd class="col-sm-9"><%= @alert.message %></dd>
-
-            <dt class="col-sm-3">Created At</dt>
-            <dd class="col-sm-9">
-              <%= @alert.created_at.strftime("%B %d, %Y at %I:%M %p") %>
-              (<%= time_ago_in_words(@alert.created_at) %> ago)
-            </dd>
-
-            <% if @alert.resolved_at %>
-              <dt class="col-sm-3">Resolved At</dt>
-              <dd class="col-sm-9">
-                <%= @alert.resolved_at.strftime("%B %d, %Y at %I:%M %p") %>
-                (<%= time_ago_in_words(@alert.resolved_at) %> ago)
-              </dd>
-            <% end %>
-
-            <% if @alert.environmental_reading %>
-              <dt class="col-sm-3">Related Reading</dt>
-              <dd class="col-sm-9">
-                Value: <%= @alert.environmental_reading.value %> <%= @alert.environmental_reading.unit %>
-                at <%= @alert.environmental_reading.recorded_at.strftime("%B %d, %Y %I:%M %p") %>
-              </dd>
-            <% end %>
-          </dl>
-
-          <div class="mt-4">
-            <%= link_to environmental_alerts_path, class: "btn btn-outline-primary me-2" do %>
+          <div class="mt-4 d-flex gap-2">
+            <%= link_to environmental_alerts_path, class: "btn btn-outline-primary" do %>
               <i class="bi bi-arrow-left"></i>
               Back to Alerts
             <% end %>
@@ -83,6 +96,7 @@
               <%= button_to resolve_environmental_alert_path(@alert),
                   method: :patch,
                   class: "btn btn-success",
+                  form: { style: "display: inline-block;" },
                   data: { turbo_confirm: "Mark this alert as resolved?" } do %>
                 <i class="bi bi-check-circle"></i>
                 Resolve Alert

@@ -71,9 +71,15 @@ class EnvironmentalSensorsController < ApplicationController
                             .active
                             .order(created_at: :desc)
 
-    # Chart data for last 24 hours
+    @latest_alert = @active_alerts.first
+
+    # Chart data with dynamic time range (default: 24 hours)
+    hours = params[:hours].to_i
+    hours = 24 unless [ 24, 168, 720 ].include?(hours)
+    @time_range_hours = hours
+
     @readings_24h = @sensor.environmental_readings
-                           .where("recorded_at >= ?", 24.hours.ago)
+                           .where("recorded_at >= ?", hours.hours.ago)
                            .order(recorded_at: :asc)
 
     respond_to do |format|

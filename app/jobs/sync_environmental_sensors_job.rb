@@ -191,11 +191,11 @@ class SyncEnvironmentalSensorsJob < ApplicationJob
 
     return unless metadata && metadata[:sensors]&.any?
 
-    # Store sensor IDs with their parameters
+    # Store sensor IDs with their parameters (use :parameter key, not :parameter_name)
     sensor_ids = metadata[:sensors].map do |s|
       {
         sensor_id: s[:sensor_id],
-        parameter: s[:parameter_name],
+        parameter: s[:parameter], # This is the correct key
         unit: s[:units]
       }
     end.compact
