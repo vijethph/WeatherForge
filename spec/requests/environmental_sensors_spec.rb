@@ -16,8 +16,8 @@ RSpec.describe "EnvironmentalSensors API" do
 
       it "displays all sensors" do
         get environmental_sensors_path
-        expect(response.body).to include(active_sensor.name)
-        expect(response.body).to include(inactive_sensor.name)
+        expect(response.body).to include(CGI.escapeHTML(active_sensor.name))
+        expect(response.body).to include(CGI.escapeHTML(inactive_sensor.name))
       end
     end
 
@@ -82,8 +82,8 @@ RSpec.describe "EnvironmentalSensors API" do
 
       it "displays sensor details" do
         get environmental_sensor_path(active_sensor)
-        expect(response.body).to include(active_sensor.name)
-        expect(response.body).to include(active_sensor.manufacturer)
+        expect(response.body).to include(CGI.escapeHTML(active_sensor.name))
+        expect(response.body).to include(CGI.escapeHTML(active_sensor.manufacturer))
       end
     end
 
