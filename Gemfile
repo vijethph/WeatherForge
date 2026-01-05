@@ -64,7 +64,7 @@ end
 
 gem "redis", "~> 5.4", ">= 5.4.1"
 gem "pg", "~> 1.6", ">= 1.6.2"
-gem "httparty", "~> 0.23.2"
+gem "httparty", "~> 0.24.0"
 gem "chartkick", "~> 5.2", ">= 5.2.1"
 gem "bootstrap", "~> 5.3", ">= 5.3.5"
 gem "dartsass-rails", "~> 0.5.1"
