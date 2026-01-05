@@ -29,6 +29,16 @@
           <% end %>
         </li>
         <li class="nav-item">
+          <%= link_to environmental_sensors_path, class: "nav-link #{current_page?(environmental_sensors_path) ? 'active' : ''}" do %>
+            <i class="bi bi-broadcast-pin"></i> Sensors
+          <% end %>
+        </li>
+        <li class="nav-item">
+          <%= link_to environmental_alerts_path, class: "nav-link #{current_page?(environmental_alerts_path) ? 'active' : ''}" do %>
+            <i class="bi bi-exclamation-triangle"></i> Alerts
+          <% end %>
+        </li>
+        <li class="nav-item">
           <%= link_to locations_path, class: "nav-link #{current_page?(locations_path) ? 'active' : ''}" do %>
             <i class="bi bi-geo-alt"></i> Locations
           <% end %>

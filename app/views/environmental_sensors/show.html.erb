@@ -1,0 +1,291 @@
+<div class="container-fluid mt-4">
+  <%= turbo_stream_from "sensor_#{@sensor.id}_alerts" %>
+  <%= turbo_stream_from "sensor_#{@sensor.id}_readings" %>
+
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><%= link_to "Dashboard", dashboards_path %></li>
+      <li class="breadcrumb-item"><%= link_to "Sensors", environmental_sensors_path %></li>
+      <li class="breadcrumb-item active"><%= @sensor.name %></li>
+    </ol>
+  </nav>
+
+  <!-- Sensor Header -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="d-flex justify-content-between align-items-start">
+        <div>
+          <h1 class="h2 mb-2"><%= @sensor.name %></h1>
+          <p class="text-muted mb-0">
+            <i class="bi bi-geo-alt"></i>
+            <%= @sensor.latitude.round(6) %>, <%= @sensor.longitude.round(6) %>
+            <% if @sensor.location %>
+              | <%= link_to @sensor.location.name, location_path(@sensor.location) %>
+            <% end %>
+          </p>
+        </div>
+        <div>
+          <span class="badge bg-<%= @sensor.status == 'active' ? 'success' : 'secondary' %> fs-6">
+            <%= @sensor.status.upcase %>
+          </span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sensor Info Cards -->
+  <div class="row mb-4">
+    <div class="col-md-3 mb-3">
+      <div class="card">
+        <div class="card-body">
+          <h6 class="card-title text-muted">Sensor Type</h6>
+          <h4><span class="badge bg-info"><%= @sensor.sensor_type.humanize %></span></h4>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+      <div class="card">
+        <div class="card-body">
+          <h6 class="card-title text-muted">Manufacturer</h6>
+          <p class="mb-0"><%= @sensor.manufacturer %></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+      <div class="card">
+        <div class="card-body">
+          <h6 class="card-title text-muted">Installation Date</h6>
+          <p class="mb-0"><%= @sensor.installation_date&.strftime("%B %d, %Y") || "N/A" %></p>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-3 mb-3">
+      <div class="card">
+        <div class="card-body">
+          <h6 class="card-title text-muted">Latest Reading</h6>
+          <% if @sensor.latest_reading %>
+            <h4 class="mb-0">
+              <%= @sensor.latest_reading.value %>
+              <small class="text-muted"><%= @sensor.latest_reading.unit %></small>
+            </h4>
+            <small class="text-muted">
+              <%= time_ago_in_words(@sensor.latest_reading.recorded_at) %> ago
+            </small>
+          <% else %>
+            <p class="mb-0 text-muted">No data</p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Map and Latest Readings Row -->
+  <div class="row mb-4">
+    <!-- Sensor Location Map -->
+    <div class="col-lg-6 mb-3">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0">
+            <i class="bi bi-map"></i>
+            Sensor Location
+          </h5>
+        </div>
+        <div class="card-body p-0">
+          <div
+            data-controller="map"
+            data-map-sensors-value="<%= [{
+              id: @sensor.id,
+              name: @sensor.name,
+              latitude: @sensor.latitude,
+              longitude: @sensor.longitude,
+              sensor_type: @sensor.sensor_type,
+              status: @sensor.status,
+              latest_reading: @sensor.latest_reading ? {
+                value: @sensor.latest_reading.value,
+                unit: @sensor.latest_reading.unit
+              } : nil
+            }].to_json %>"
+            data-map-center-value="<%= [@sensor.latitude, @sensor.longitude].to_json %>"
+            data-map-zoom-value="15"
+            data-map-hide-view-details-value="true"
+            style="height: 350px;"
+          >
+            <div data-map-target="container" style="height: 100%; width: 100%;"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Latest Readings -->
+    <div class="col-lg-6 mb-3">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">
+            <i class="bi bi-activity"></i>
+            Latest Readings
+          </h5>
+          <%= link_to "View All", environmental_sensor_environmental_readings_path(@sensor), class: "btn btn-sm btn-outline-primary", target: "_blank" %>
+        </div>
+        <div class="card-body" style="max-height: 350px; overflow-y: auto;">
+          <% if @readings.any? %>
+            <div class="list-group list-group-flush">
+              <% @readings.first(10).each do |reading| %>
+                <div class="list-group-item">
+                  <div class="d-flex justify-content-between align-items-center">
+                    <div>
+                      <strong><%= reading.parameter_name %></strong>
+                      <br>
+                      <small class="text-muted">
+                        <%= reading.recorded_at.strftime("%b %d, %Y %I:%M %p") %>
+                      </small>
+                    </div>
+                    <div class="text-end">
+                      <h5 class="mb-0 text-primary">
+                        <%= reading.value %>
+                        <small class="text-muted"><%= reading.unit %></small>
+                      </h5>
+                    </div>
+                  </div>
+                </div>
+              <% end %>
+            </div>
+          <% else %>
+            <div class="alert alert-info mb-0">
+              <i class="bi bi-info-circle"></i>
+              No readings available yet.
+              <% if @sensor.metadata["openaq_sensor_ids"].blank? %>
+                This sensor needs to be configured to fetch data from OpenAQ.
+              <% else %>
+                Readings will be automatically synced every 15 minutes.
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Readings Chart -->
+  <div class="row mt-5 mb-4">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">
+            <i class="bi bi-graph-up"></i>
+            Readings Trend (Last <%= @time_range_hours == 24 ? '24 Hours' : @time_range_hours == 168 ? '7 Days' : '30 Days' %>)
+          </h5>
+          <div class="btn-group btn-group-sm" role="group">
+            <%= link_to "24h", environmental_sensor_path(@sensor, hours: 24), class: "btn btn-outline-primary #{'active' if @time_range_hours == 24}" %>
+            <%= link_to "7d", environmental_sensor_path(@sensor, hours: 168), class: "btn btn-outline-primary #{'active' if @time_range_hours == 168}" %>
+            <%= link_to "30d", environmental_sensor_path(@sensor, hours: 720), class: "btn btn-outline-primary #{'active' if @time_range_hours == 720}" %>
+          </div>
+        </div>
+        <div class="card-body">
+          <% if @readings_24h.any? %>
+            <% chart_data = @readings_24h.reverse.map { |r| [r.recorded_at, r.value] }.to_h %>
+            <%= line_chart chart_data,
+                height: "350px",
+                library: {
+                  scales: {
+                    y: {
+                      beginAtZero: true,
+                      title: { display: true, text: @readings_24h.first&.unit || "" }
+                    },
+                    x: {
+                      type: 'time',
+                      time: { unit: 'hour' }
+                    }
+                  },
+                  plugins: {
+                    legend: { display: false }
+                  }
+                } %>
+          <% else %>
+            <div class="alert alert-info mb-0">
+              <i class="bi bi-info-circle"></i>
+              No readings data available for charting yet.
+              <% if @sensor.metadata["openaq_sensor_ids"].blank? %>
+                This sensor needs to be configured to fetch data from OpenAQ.
+              <% elsif @readings.any? %>
+                Try selecting a different time range above.
+              <% else %>
+                Readings will be automatically synced every 15 minutes.
+              <% end %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Active Alerts -->
+  <div class="row mb-4">
+    <div class="col-12">
+      <div id="sensor_<%= @sensor.id %>_latest_alert">
+        <%= render "environmental_alerts/latest_alert_card", alert: @latest_alert %>
+      </div>
+    </div>
+  </div>
+
+  <!-- Sensor Metadata -->
+  <% if @sensor.metadata.present? && @sensor.metadata.any? %>
+    <div class="row mt-5 mb-4">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header">
+            <h5 class="mb-0">
+              <i class="bi bi-info-square"></i>
+              Sensor Metadata
+            </h5>
+          </div>
+          <div class="card-body">
+            <div class="table-responsive">
+              <table class="table table-bordered table-striped mb-0">
+                <thead class="table-light">
+                  <tr>
+                    <th style="width: 30%; font-size: 1.05rem;">Property</th>
+                    <th style="width: 70%; font-size: 1.05rem;">Value</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @sensor.metadata.each do |key, value| %>
+                    <% next if value.nil? || (value.respond_to?(:empty?) && value.empty?) %>
+                    <tr>
+                      <td style="font-size: 1rem;"><strong><%= key.humanize %></strong></td>
+                      <td style="font-size: 1rem;">
+                        <% if key == "parameters" && value.is_a?(Array) %>
+                          <% value.each do |param| %>
+                            <span class="badge rounded-pill bg-primary me-1 mb-1"><%= param %></span>
+                          <% end %>
+                        <% elsif key == "instruments" && value.is_a?(Array) %>
+                          <% value.each do |instrument| %>
+                            <span class="badge rounded-pill bg-info me-1 mb-1"><%= instrument %></span>
+                          <% end %>
+                        <% elsif value.is_a?(Hash) %>
+                          <dl class="row mb-0">
+                            <% value.each do |k, v| %>
+                              <dt class="col-sm-4"><%= k.humanize %></dt>
+                              <dd class="col-sm-8"><%= v %></dd>
+                            <% end %>
+                          </dl>
+                        <% elsif value.is_a?(Array) %>
+                          <%= value.join(", ") %>
+                        <% else %>
+                          <%= value %>
+                        <% end %>
+                      </td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

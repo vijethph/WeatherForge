@@ -1,0 +1,68 @@
+<div class="container-fluid mt-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><%= link_to "Dashboard", dashboards_path %></li>
+      <li class="breadcrumb-item"><%= link_to "Sensors", environmental_sensors_path %></li>
+      <li class="breadcrumb-item"><%= link_to @sensor.name, environmental_sensor_path(@sensor) %></li>
+      <li class="breadcrumb-item active">Readings</li>
+    </ol>
+  </nav>
+
+  <div class="row mb-4">
+    <div class="col-12">
+      <h1 class="h2">Readings for <%= @sensor.name %></h1>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+          <h5 class="mb-0">
+            <i class="bi bi-list-columns"></i>
+            All Readings
+          </h5>
+          <div class="btn-group btn-group-sm">
+            <%= link_to "1h", environmental_sensor_environmental_readings_path(@sensor, hours: 1), class: "btn btn-outline-primary #{'active' if params[:hours] == '1'}" %>
+            <%= link_to "6h", environmental_sensor_environmental_readings_path(@sensor, hours: 6), class: "btn btn-outline-primary #{'active' if params[:hours] == '6'}" %>
+            <%= link_to "24h", environmental_sensor_environmental_readings_path(@sensor, hours: 24), class: "btn btn-outline-primary #{'active' if params[:hours] == '24'}" %>
+            <%= link_to "7d", environmental_sensor_environmental_readings_path(@sensor, hours: 168), class: "btn btn-outline-primary #{'active' if params[:hours] == '168' || params[:hours].blank?}" %>
+          </div>
+        </div>
+        <div class="card-body">
+          <% if @readings.any? %>
+            <div class="table-responsive">
+              <table class="table table-striped table-hover">
+                <thead>
+                  <tr>
+                    <th>Parameter</th>
+                    <th>Value</th>
+                    <th>Unit</th>
+                    <th>Recorded At</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <% @readings.each do |reading| %>
+                    <tr>
+                      <td><strong><%= reading.parameter_name %></strong></td>
+                      <td class="text-primary"><%= reading.value %></td>
+                      <td><%= reading.unit %></td>
+                      <td><%= reading.recorded_at.strftime("%b %d, %Y %I:%M %p") %></td>
+                    </tr>
+                  <% end %>
+                </tbody>
+              </table>
+            </div>
+
+            <%== pagy_bootstrap_nav(@pagy) if defined?(@pagy) %>
+          <% else %>
+            <div class="alert alert-info">
+              <i class="bi bi-info-circle"></i>
+              No readings found for the selected time range.
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

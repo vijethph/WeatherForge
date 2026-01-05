@@ -189,13 +189,23 @@ class SyncWeatherJob < ApplicationJob
   end
 
   def broadcast_chart_updates(location)
-    %w[temperature_chart humidity_chart hourly_forecast historical_chart
-       marine_weather air_quality flood_risk].each do |target|
+    # Broadcast chart updates (these are in dashboards/charts/)
+    %w[temperature_chart humidity_chart hourly_forecast historical_chart].each do |target|
       Turbo::StreamsChannel.broadcast_update_to(
         "location_updates",
         target: target,
         partial: "dashboards/charts/#{target}",
         locals: { location: location }
+      )
+    end
+
+    # Broadcast environmental updates (these are in dashboards/)
+    %w[marine_weather air_quality flood_risk].each do |target|
+      Turbo::StreamsChannel.broadcast_update_to(
+        "location_updates",
+        target: target,
+        partial: "dashboards/#{target}",
+        locals: { locations: Location.all }
       )
     end
   end

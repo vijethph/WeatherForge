@@ -1,0 +1,224 @@
+<div class="container-fluid mt-4">
+  <div class="row mb-4">
+    <div class="col-12">
+      <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+          <li class="breadcrumb-item"><%= link_to "Dashboard", dashboards_path %></li>
+          <li class="breadcrumb-item"><%= link_to "Sensors", environmental_sensors_path %></li>
+          <li class="breadcrumb-item active">Search Sensors</li>
+        </ol>
+      </nav>
+
+      <h1 class="h2">Search for Environmental Sensors</h1>
+      <p class="text-muted">Search for sensors near a location using OpenAQ API</p>
+    </div>
+  </div>
+
+  <!-- Search Form -->
+  <div class="row mb-4">
+    <div class="col-lg-8">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-search"></i> Search Parameters</h5>
+        </div>
+        <div class="card-body">
+          <%= form_with url: search_environmental_sensors_path, method: :get, class: "needs-validation" do |f| %>
+            <div class="row g-3">
+              <div class="col-md-6">
+                <%= f.label :latitude, "Latitude", class: "form-label" %>
+                <%= f.number_field :latitude,
+                    class: "form-control",
+                    step: "any",
+                    placeholder: "e.g., 37.7749",
+                    required: true,
+                    value: params[:latitude] %>
+                <div class="form-text">Latitude coordinate (-90 to 90)</div>
+              </div>
+
+              <div class="col-md-6">
+                <%= f.label :longitude, "Longitude", class: "form-label" %>
+                <%= f.number_field :longitude,
+                    class: "form-control",
+                    step: "any",
+                    placeholder: "e.g., -122.4194",
+                    required: true,
+                    value: params[:longitude] %>
+                <div class="form-text">Longitude coordinate (-180 to 180)</div>
+              </div>
+
+              <div class="col-md-6">
+                <%= f.label :radius, "Search Radius (km)", class: "form-label" %>
+                <%= f.number_field :radius,
+                    class: "form-control",
+                    value: params[:radius] || 25,
+                    min: 1,
+                    max: 25,
+                    step: 1 %>
+                <div class="form-text">Maximum 25 km (OpenAQ API limit)</div>
+              </div>
+
+              <div class="col-md-6">
+                <%= f.label :limit, "Maximum Results", class: "form-label" %>
+                <%= f.number_field :limit,
+                    class: "form-control",
+                    value: params[:limit] || 50,
+                    min: 1,
+                    max: 100,
+                    step: 1 %>
+                <div class="form-text">Maximum number of sensors to retrieve</div>
+              </div>
+
+              <div class="col-12">
+                <%= f.label :parameters, "Parameters (comma-separated)", class: "form-label" %>
+                <%= f.text_field :parameters,
+                    class: "form-control",
+                    placeholder: "pm25,pm10,o3,no2,so2,co",
+                    value: params[:parameters] || "pm25,pm10,o3" %>
+                <div class="form-text">
+                  Available: pm25, pm10, pm1, o3, no2, so2, co, bc
+                </div>
+              </div>
+
+              <div class="col-12">
+                <%= f.submit "Search Sensors", class: "btn btn-primary" %>
+                <%= link_to "Cancel", environmental_sensors_path, class: "btn btn-outline-secondary ms-2" %>
+              </div>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Location Selector -->
+    <div class="col-lg-4">
+      <div class="card">
+        <div class="card-header">
+          <h5 class="mb-0"><i class="bi bi-pin-map"></i> Quick Select Location</h5>
+        </div>
+        <div class="card-body">
+          <p class="text-muted small">Select from existing locations:</p>
+          <% Location.all.each do |location| %>
+            <div class="d-grid gap-2 mb-2">
+              <%= link_to search_environmental_sensors_path(
+                    latitude: location.latitude,
+                    longitude: location.longitude,
+                    radius: 25,
+                    parameters: "pm25,pm10,o3"
+                  ),
+                  class: "btn btn-outline-primary btn-sm text-start" do %>
+                <i class="bi bi-geo-alt"></i> <%= location.name %>
+                <br>
+                <small class="text-muted">
+                  <%= location.latitude.round(4) %>, <%= location.longitude.round(4) %>
+                </small>
+              <% end %>
+            </div>
+          <% end %>
+
+          <% if Location.none? %>
+            <div class="alert alert-info small mb-0">
+              No locations available. <%= link_to "Add a location", locations_path %> first.
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search Results -->
+  <% if @results.present? %>
+    <div class="row">
+      <div class="col-12">
+        <div class="card">
+          <div class="card-header d-flex justify-content-between align-items-center">
+            <h5 class="mb-0">
+              <i class="bi bi-list-check"></i> Search Results
+            </h5>
+            <span class="badge bg-info"><%= @results.count %> sensors found</span>
+          </div>
+          <div class="card-body">
+            <% if @results.any? %>
+              <div class="table-responsive">
+                <table class="table table-bordered table-hover table-striped">
+                  <thead class="table-light">
+                    <tr>
+                      <th style="font-size: 1.1rem;">Sensor Name</th>
+                      <th style="font-size: 1.1rem;">Location</th>
+                      <th style="font-size: 1.1rem;">Parameters</th>
+                      <th style="font-size: 1.1rem;">Provider</th>
+                      <th style="font-size: 1.1rem;">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <% @results.each do |result| %>
+                      <tr>
+                        <td style="font-size: 1rem;">
+                          <strong><%= result[:name] || result["name"] %></strong>
+                          <% if result[:id] || result["id"] %>
+                            <br>
+                            <small class="text-muted">ID: <%= result[:id] || result["id"] %></small>
+                          <% end %>
+                        </td>
+                        <td style="font-size: 0.95rem;">
+                          <% latitude = result[:latitude] || result["latitude"] %>
+                          <% longitude = result[:longitude] || result["longitude"] %>
+                          <% if latitude && longitude %>
+                            <i class="bi bi-geo-alt"></i>
+                            <%= latitude.round(4) %>, <%= longitude.round(4) %>
+                          <% end %>
+                        </td>
+                        <td style="font-size: 0.9rem;">
+                          <% params_list = result[:parameters] || result["parameters"] %>
+                          <% if params_list && params_list.any? %>
+                            <% params_list.each do |param| %>
+                              <span class="badge rounded-pill bg-primary me-1 mb-1"><%= param.is_a?(Hash) ? (param[:name] || param["name"]) : param %></span>
+                            <% end %>
+                          <% else %>
+                            <span class="text-muted">No parameters</span>
+                          <% end %>
+                        </td>
+                        <td style="font-size: 0.95rem;">
+                          <%= result[:provider] || result["provider"] || "N/A" %>
+                        </td>
+                        <td>
+                          <%= button_to "Import",
+                              import_from_openaq_environmental_sensors_path(
+                                openaq_id: result[:openaq_id] || result["openaq_id"],
+                                latitude: result[:latitude] || result["latitude"],
+                                longitude: result[:longitude] || result["longitude"],
+                                name: result[:name] || result["name"]
+                              ),
+                              class: "btn btn-sm btn-success",
+                              data: { turbo_confirm: "Import this sensor?" } %>
+                        </td>
+                      </tr>
+                    <% end %>
+                  </tbody>
+                </table>
+              </div>
+            <% else %>
+              <div class="alert alert-warning">
+                <i class="bi bi-exclamation-triangle"></i>
+                No sensors found in this area. Try:
+                <ul class="mb-0 mt-2">
+                  <li>Increasing the search radius</li>
+                  <li>Changing the location</li>
+                  <li>Using different parameters</li>
+                </ul>
+              </div>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  <% elsif params[:latitude].present? %>
+    <div class="row">
+      <div class="col-12">
+        <div class="alert alert-info">
+          <i class="bi bi-hourglass-split"></i>
+          Searching for sensors near <%= params[:latitude] %>, <%= params[:longitude] %>...
+        </div>
+      </div>
+    </div>
+  <% end %>
+</div>

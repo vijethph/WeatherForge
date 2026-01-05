@@ -80,7 +80,6 @@ RSpec.describe 'Dashboards API', type: :request do
       description 'Manually triggers a weather data synchronization for all locations via Sidekiq background job'
 
       response '302', 'redirect after sync' do
-        schema type: :string
         run_test! do |response|
           expect(response).to have_http_status(:found)
           expect(response).to redirect_to(dashboards_path)

@@ -1,0 +1,81 @@
+# syntax=docker/dockerfile:1
+# Development Dockerfile for WeatherForge
+# Optimized for rapid development with volume mounts and hot reloading
+
+ARG RUBY_VERSION=3.4.5
+ARG NODE_VERSION=22.12.0
+
+FROM ruby:${RUBY_VERSION}-slim
+
+# Set build args for this stage
+ARG NODE_VERSION=22.12.0
+ARG USER_ID=1000
+ARG GROUP_ID=1000
+
+# Install system dependencies for development
+RUN apt-get update -qq && \
+    apt-get install --no-install-recommends -y \
+    build-essential \
+    curl \
+    git \
+    libpq-dev \
+    libvips \
+    libyaml-dev \
+    node-gyp \
+    pkg-config \
+    postgresql-client \
+    python-is-python3 \
+    vim \
+    && rm -rf /var/lib/apt/lists /var/cache/apt/archives
+
+# Install Node.js for JavaScript bundling
+ENV PATH=/usr/local/node/bin:$PATH
+RUN curl -sL https://github.com/nodenv/node-build/archive/master.tar.gz | tar xz -C /tmp/ && \
+    /tmp/node-build-master/bin/node-build "${NODE_VERSION}" /usr/local/node && \
+    rm -rf /tmp/node-build-master
+
+# Set working directory
+WORKDIR /rails
+
+# Set development environment
+ENV RAILS_ENV=development \
+    BUNDLE_PATH=/usr/local/bundle \
+    NODE_ENV=development
+
+# Create non-root user matching host user ID to avoid permission issues
+# This will be overridden by docker-compose if USER_ID/GROUP_ID are provided
+
+RUN groupadd --gid ${GROUP_ID} rails || true && \
+    useradd --uid ${USER_ID} --gid ${GROUP_ID} --create-home --shell /bin/bash rails || true && \
+    mkdir -p /rails/tmp /rails/log /rails/storage && \
+    chown -R ${USER_ID}:${GROUP_ID} /rails /usr/local/bundle
+
+# Switch to non-root user
+USER ${USER_ID}:${GROUP_ID}
+
+# Install bundler
+RUN gem install bundler -v '~> 2.6'
+
+# Copy dependency files first (for layer caching)
+COPY --chown=${USER_ID}:${GROUP_ID} Gemfile Gemfile.lock ./
+
+# Install gems with full build tools available
+RUN bundle install
+
+# Copy package files
+COPY --chown=${USER_ID}:${GROUP_ID} package.json package-lock.json ./
+
+# Install node modules
+RUN npm ci
+
+# Copy application code
+COPY --chown=${USER_ID}:${GROUP_ID} . .
+
+# Precompile bootsnap for faster boot times
+RUN bundle exec bootsnap precompile --gemfile app/ lib/ || true
+
+# Expose port 3000
+EXPOSE 3000
+
+# Default command (can be overridden by docker-compose)
+CMD ["bin/rails", "server", "-b", "0.0.0.0"]

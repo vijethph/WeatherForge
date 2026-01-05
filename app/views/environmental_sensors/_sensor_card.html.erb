@@ -1,0 +1,29 @@
+<div class="list-group-item list-group-item-action" id="sensor_card_<%= sensor.id %>">
+  <%= link_to environmental_sensor_path(sensor), class: "text-decoration-none text-dark" do %>
+    <div class="d-flex w-100 justify-content-between align-items-start">
+      <div>
+        <h6 class="mb-1"><%= sensor.name %></h6>
+        <p class="mb-1 small text-muted">
+          <i class="bi bi-geo-alt"></i>
+          <%= sensor.latitude.round(4) %>, <%= sensor.longitude.round(4) %>
+        </p>
+        <p class="mb-0 small">
+          <span class="badge bg-<%= sensor.status == 'active' ? 'success' : 'secondary' %>">
+            <%= sensor.status %>
+          </span>
+          <span class="badge bg-info ms-1">
+            <%= sensor.sensor_type.humanize %>
+          </span>
+        </p>
+      </div>
+      <div class="text-end">
+        <% if sensor.latest_reading %>
+          <strong class="text-primary"><%= sensor.latest_reading.value %></strong>
+          <small class="text-muted"><%= sensor.latest_reading.unit %></small>
+        <% else %>
+          <small class="text-muted">No data</small>
+        <% end %>
+      </div>
+    </div>
+  <% end %>
+</div>

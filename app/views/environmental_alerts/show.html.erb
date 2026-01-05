@@ -1,0 +1,110 @@
+<div class="container-fluid mt-4">
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+      <li class="breadcrumb-item"><%= link_to "Dashboard", dashboards_path %></li>
+      <li class="breadcrumb-item"><%= link_to "Alerts", environmental_alerts_path %></li>
+      <li class="breadcrumb-item active">Alert #<%= @alert.id %></li>
+    </ol>
+  </nav>
+
+  <div class="row mb-4">
+    <div class="col-12">
+      <div class="card border-<%= @alert.severity_color %>">
+        <div class="card-header bg-<%= @alert.severity_color %> text-white">
+          <div class="d-flex justify-content-between align-items-center">
+            <h2 class="h4 mb-0">
+              <i class="bi bi-exclamation-triangle"></i>
+              <%= @alert.alert_type.humanize %>
+            </h2>
+            <span class="badge bg-light text-dark fs-6">
+              <%= @alert.severity.upcase %>
+            </span>
+          </div>
+        </div>
+        <div class="card-body">
+          <h5 class="card-title">Alert Details</h5>
+
+          <div class="table-responsive">
+            <table class="table table-bordered table-striped">
+              <tbody>
+                <tr>
+                  <th style="width: 25%;">Alert Type</th>
+                  <td><%= @alert.alert_type.humanize %></td>
+                </tr>
+                <tr>
+                  <th>Severity</th>
+                  <td>
+                    <span class="badge bg-<%= @alert.severity_color %>"><%= @alert.severity.upcase %></span>
+                  </td>
+                </tr>
+                <tr>
+                  <th>Status</th>
+                  <td>
+                    <% if @alert.resolved_at %>
+                      <span class="badge bg-success">RESOLVED</span>
+                    <% else %>
+                      <span class="badge bg-danger">ACTIVE</span>
+                    <% end %>
+                  </td>
+                </tr>
+                <tr>
+                  <th>Sensor</th>
+                  <td>
+                    <%= link_to @alert.environmental_sensor.name, environmental_sensor_path(@alert.environmental_sensor) %>
+                  </td>
+                </tr>
+                <tr>
+                  <th>Message</th>
+                  <td><%= @alert.message %></td>
+                </tr>
+                <tr>
+                  <th>Created At</th>
+                  <td>
+                    <%= @alert.created_at.strftime("%B %d, %Y at %I:%M %p") %>
+                    (<%= time_ago_in_words(@alert.created_at) %> ago)
+                  </td>
+                </tr>
+                <% if @alert.resolved_at %>
+                  <tr>
+                    <th>Resolved At</th>
+                    <td>
+                      <%= @alert.resolved_at.strftime("%B %d, %Y at %I:%M %p") %>
+                      (<%= time_ago_in_words(@alert.resolved_at) %> ago)
+                    </td>
+                  </tr>
+                <% end %>
+                <% if @alert.environmental_reading %>
+                  <tr>
+                    <th>Related Reading</th>
+                    <td>
+                      Value: <%= @alert.environmental_reading.value %> <%= @alert.environmental_reading.unit %>
+                      at <%= @alert.environmental_reading.recorded_at.strftime("%B %d, %Y %I:%M %p") %>
+                    </td>
+                  </tr>
+                <% end %>
+              </tbody>
+            </table>
+          </div>
+
+          <div class="mt-4 d-flex gap-2">
+            <%= link_to environmental_alerts_path, class: "btn btn-outline-primary" do %>
+              <i class="bi bi-arrow-left"></i>
+              Back to Alerts
+            <% end %>
+
+            <% unless @alert.resolved_at %>
+              <%= button_to resolve_environmental_alert_path(@alert),
+                  method: :patch,
+                  class: "btn btn-success",
+                  form: { style: "display: inline-block;" },
+                  data: { turbo_confirm: "Mark this alert as resolved?" } do %>
+                <i class="bi bi-check-circle"></i>
+                Resolve Alert
+              <% end %>
+            <% end %>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

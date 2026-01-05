@@ -10,11 +10,15 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2025_12_27_191426) do
+ActiveRecord::Schema[8.1].define(version: 2026_01_04_220835) do
+  # These are extensions that must be enabled in order to support this database
+  enable_extension "pg_catalog.plpgsql"
+  enable_extension "postgis"
+
   create_table "air_qualities", force: :cascade do |t|
     t.integer "aqi_level"
     t.datetime "created_at", null: false
-    t.integer "location_id", null: false
+    t.bigint "location_id", null: false
     t.decimal "no2", precision: 6, scale: 2
     t.decimal "o3", precision: 6, scale: 2
     t.decimal "pm10", precision: 6, scale: 2
@@ -26,12 +30,80 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_27_191426) do
     t.index ["location_id"], name: "index_air_qualities_on_location_id"
   end
 
+  create_table "environmental_alerts", force: :cascade do |t|
+    t.string "alert_type", null: false
+    t.datetime "created_at", null: false
+    t.bigint "environmental_reading_id"
+    t.bigint "environmental_sensor_id", null: false
+    t.text "message", null: false
+    t.jsonb "metadata", default: {}
+    t.datetime "resolved_at"
+    t.string "severity", null: false
+    t.datetime "updated_at", null: false
+    t.index ["alert_type"], name: "index_environmental_alerts_on_alert_type"
+    t.index ["created_at"], name: "index_alerts_critical_active", where: "(((severity)::text = 'critical'::text) AND (resolved_at IS NULL))"
+    t.index ["created_at"], name: "index_environmental_alerts_on_created_at"
+    t.index ["environmental_reading_id"], name: "index_environmental_alerts_on_environmental_reading_id"
+    t.index ["environmental_sensor_id", "created_at"], name: "index_alerts_sensor_created"
+    t.index ["environmental_sensor_id", "resolved_at"], name: "index_alerts_sensor_resolved"
+    t.index ["environmental_sensor_id"], name: "index_environmental_alerts_on_environmental_sensor_id"
+    t.index ["resolved_at"], name: "index_environmental_alerts_on_resolved_at"
+    t.index ["severity", "created_at"], name: "index_alerts_active_by_severity", where: "(resolved_at IS NULL)"
+    t.index ["severity", "resolved_at"], name: "index_alerts_severity_resolved"
+    t.index ["severity"], name: "index_environmental_alerts_on_severity"
+  end
+
+  create_table "environmental_readings", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.bigint "environmental_sensor_id", null: false
+    t.string "parameter_name"
+    t.jsonb "raw_data", default: {}
+    t.datetime "recorded_at", null: false
+    t.string "unit", null: false
+    t.datetime "updated_at", null: false
+    t.float "value", null: false
+    t.index ["environmental_sensor_id", "recorded_at"], name: "index_readings_sensor_recorded_unique", unique: true
+    t.index ["environmental_sensor_id", "recorded_at"], name: "index_readings_sensor_time_range"
+    t.index ["environmental_sensor_id", "value"], name: "index_readings_sensor_value"
+    t.index ["environmental_sensor_id"], name: "index_environmental_readings_on_environmental_sensor_id"
+    t.index ["parameter_name"], name: "index_environmental_readings_on_parameter_name"
+    t.index ["recorded_at"], name: "index_environmental_readings_on_recorded_at"
+    t.index ["value"], name: "index_environmental_readings_on_value"
+  end
+
+  create_table "environmental_sensors", force: :cascade do |t|
+    t.datetime "created_at", null: false
+    t.geometry "geom", limit: {srid: 4326, type: "st_point"}
+    t.date "installation_date", null: false
+    t.date "last_maintenance"
+    t.float "latitude", null: false
+    t.bigint "location_id"
+    t.float "longitude", null: false
+    t.string "manufacturer", null: false
+    t.jsonb "metadata", default: {}
+    t.string "model_number"
+    t.string "name", null: false
+    t.string "sensor_type", default: "air_quality", null: false
+    t.string "status", default: "active", null: false
+    t.datetime "updated_at", null: false
+    t.index ["geom"], name: "index_environmental_sensors_on_geom", using: :gist
+    t.index ["installation_date"], name: "index_environmental_sensors_on_installation_date"
+    t.index ["latitude"], name: "index_environmental_sensors_on_latitude"
+    t.index ["location_id", "status"], name: "index_sensors_on_location_and_status"
+    t.index ["location_id"], name: "index_environmental_sensors_on_location_id"
+    t.index ["longitude"], name: "index_environmental_sensors_on_longitude"
+    t.index ["name"], name: "index_environmental_sensors_on_name"
+    t.index ["sensor_type", "status"], name: "index_sensors_on_type_and_status"
+    t.index ["sensor_type"], name: "index_environmental_sensors_on_sensor_type"
+    t.index ["status"], name: "index_environmental_sensors_on_status"
+  end
+
   create_table "flood_risks", force: :cascade do |t|
     t.datetime "created_at", null: false
     t.text "flood_description"
     t.decimal "flood_probability", precision: 5, scale: 2
     t.string "flood_severity"
-    t.integer "location_id", null: false
+    t.bigint "location_id", null: false
     t.datetime "recorded_at", null: false
     t.datetime "updated_at", null: false
     t.index ["location_id", "recorded_at"], name: "index_flood_risks_on_location_id_and_recorded_at", unique: true
@@ -41,7 +113,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_27_191426) do
   create_table "historical_weathers", force: :cascade do |t|
     t.decimal "avg_temperature", precision: 5, scale: 2
     t.datetime "created_at", null: false
-    t.integer "location_id", null: false
+    t.bigint "location_id", null: false
     t.decimal "max_temperature", precision: 5, scale: 2
     t.decimal "min_temperature", precision: 5, scale: 2
     t.decimal "total_precipitation", precision: 5, scale: 2
@@ -57,7 +129,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_27_191426) do
     t.datetime "created_at", null: false
     t.datetime "forecast_time", null: false
     t.integer "humidity"
-    t.integer "location_id", null: false
+    t.bigint "location_id", null: false
     t.decimal "precipitation", precision: 5, scale: 2
     t.integer "precipitation_probability"
     t.decimal "temperature", precision: 5, scale: 2
@@ -74,18 +146,20 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_27_191426) do
     t.datetime "created_at", null: false
     t.text "description"
     t.decimal "elevation", precision: 8, scale: 2
+    t.geometry "geom", limit: {srid: 4326, type: "st_point"}
     t.decimal "latitude", precision: 10, scale: 6, null: false
     t.decimal "longitude", precision: 10, scale: 6, null: false
     t.string "name", null: false
     t.string "timezone", default: "UTC"
     t.datetime "updated_at", null: false
+    t.index ["geom"], name: "index_locations_on_geom", using: :gist
     t.index ["latitude", "longitude"], name: "index_locations_on_latitude_and_longitude", unique: true
     t.index ["name"], name: "index_locations_on_name", unique: true
   end
 
   create_table "marine_weathers", force: :cascade do |t|
     t.datetime "created_at", null: false
-    t.integer "location_id", null: false
+    t.bigint "location_id", null: false
     t.datetime "recorded_at", null: false
     t.datetime "updated_at", null: false
     t.decimal "water_temperature", precision: 5, scale: 2
@@ -96,10 +170,10 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_27_191426) do
   end
 
   create_table "solid_cable_messages", force: :cascade do |t|
-    t.binary "channel", limit: 1024, null: false
+    t.binary "channel", null: false
     t.bigint "channel_hash", null: false
     t.datetime "created_at", null: false
-    t.binary "payload", limit: 536870912, null: false
+    t.binary "payload", null: false
     t.index ["channel"], name: "index_solid_cable_messages_on_channel"
     t.index ["channel_hash"], name: "index_solid_cable_messages_on_channel_hash"
     t.index ["created_at"], name: "index_solid_cable_messages_on_created_at"
@@ -108,9 +182,9 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_27_191426) do
   create_table "solid_cache_entries", force: :cascade do |t|
     t.integer "byte_size", null: false
     t.datetime "created_at", null: false
-    t.binary "key", limit: 1024, null: false
+    t.binary "key", null: false
     t.bigint "key_hash", null: false
-    t.binary "value", limit: 536870912, null: false
+    t.binary "value", null: false
     t.index ["byte_size"], name: "index_solid_cache_entries_on_byte_size"
     t.index ["key_hash", "byte_size"], name: "index_solid_cache_entries_on_key_hash_and_byte_size"
     t.index ["key_hash"], name: "index_solid_cache_entries_on_key_hash", unique: true
@@ -242,7 +316,7 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_27_191426) do
     t.datetime "created_at", null: false
     t.decimal "feels_like", precision: 5, scale: 2
     t.integer "humidity"
-    t.integer "location_id", null: false
+    t.bigint "location_id", null: false
     t.decimal "precipitation", precision: 5, scale: 2
     t.decimal "pressure", precision: 7, scale: 2
     t.datetime "recorded_at", null: false
@@ -259,6 +333,10 @@ ActiveRecord::Schema[8.1].define(version: 2025_12_27_191426) do
   end
 
   add_foreign_key "air_qualities", "locations"
+  add_foreign_key "environmental_alerts", "environmental_readings"
+  add_foreign_key "environmental_alerts", "environmental_sensors"
+  add_foreign_key "environmental_readings", "environmental_sensors"
+  add_foreign_key "environmental_sensors", "locations"
   add_foreign_key "flood_risks", "locations"
   add_foreign_key "historical_weathers", "locations"
   add_foreign_key "hourly_forecasts", "locations"

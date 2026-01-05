@@ -4,8 +4,6 @@ source "https://rubygems.org"
 gem "rails", "~> 8.1.0"
 # The modern asset pipeline for Rails [https://github.com/rails/propshaft]
 gem "propshaft"
-# Use sqlite3 as the database for Active Record
-gem "sqlite3", ">= 2.1"
 # Use the Puma web server [https://github.com/puma/puma]
 gem "puma", ">= 5.0"
 # Bundle and transpile JavaScript [https://github.com/rails/jsbundling-rails]
@@ -78,9 +76,15 @@ gem "binding_of_caller", "~> 1.0", ">= 1.0.1"
 gem "lograge", "~> 0.14.0"
 gem "dotenv-rails", "~> 3.2"
 gem "rswag", "~> 2.17"
+gem "activerecord-postgis-adapter", "~> 11.1", ">= 11.1.1"
+gem "rgeo", "~> 3.0", ">= 3.0.1"
+gem "rgeo-geojson", "~> 2.2"
+gem "geocoder", "~> 1.8", ">= 1.8.6"
+
 
 gem "rspec-rails", "~> 8.0", ">= 8.0.2", group: [ :development, :test ]
 gem "factory_bot_rails", "~> 6.5", ">= 6.5.1", group: [ :development, :test ]
 gem "faker", "~> 3.5", ">= 3.5.3", group: [ :development, :test ]
 gem "shoulda-matchers", "~> 7.0", group: :test
 gem "kaminari", "~> 1.2", ">= 1.2.2"
+gem "webmock", "~> 3.26", ">= 3.26.1"

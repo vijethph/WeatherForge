@@ -14,3 +14,15 @@
     class: SyncWeatherJob
     queue: default
     description: "Sync all weather data from 7 Open Meteo APIs every 5 minutes"
+
+  sync_environmental_sensors_job:
+    cron: "*/15 * * * *"
+    class: SyncEnvironmentalSensorsJob
+    queue: default
+    description: "Discover and sync environmental sensors from OpenAQ API every 15 minutes"
+
+  sync_environmental_readings_job:
+    cron: "*/15 * * * *"
+    class: SyncEnvironmentalReadingsJob
+    queue: default
+    description: "Fetch latest measurements for all active environmental sensors every 15 minutes"

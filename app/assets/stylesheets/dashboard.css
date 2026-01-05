@@ -6,6 +6,31 @@ turbo-frame {
 }
 
 /* Weather Card Hover Effect */
+/* Dashboard and global application styles */
+
+body {
+  min-height: 100vh;
+}
+
+.navbar-brand {
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+.nav-link {
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.nav-link:hover {
+  color: #fff !important;
+}
+
+.nav-link.active {
+  color: #fff !important;
+}
+
+/* Weather card styles */
 .card {
   transition: transform 0.2s, box-shadow 0.2s;
 }
@@ -51,6 +76,26 @@ form.d-inline {
 .chart-wrapper {
   min-height: 300px;
   transition: opacity 0.3s ease;
+}
+
+/* Map container styles */
+.leaflet-container {
+  height: 100%;
+  width: 100%;
+  z-index: 1;
+}
+
+[data-controller="map"] {
+  position: relative;
+  height: 100%;
+  width: 100%;
+}
+
+[data-map-target="container"] {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  min-height: 400px;
 }
 
 /* Responsive adjustments */

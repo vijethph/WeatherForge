@@ -1,0 +1,33 @@
+<% if alert %>
+  <div class="card border-<%= alert.severity_color %>">
+    <div class="card-header bg-<%= alert.severity_color %> bg-opacity-10">
+      <h5 class="mb-0">
+        <i class="bi bi-exclamation-triangle text-<%= alert.severity_color %>"></i>
+        Latest Alert
+        <span class="badge bg-<%= alert.severity_color %> ms-2"><%= alert.severity.upcase %></span>
+      </h5>
+    </div>
+    <div class="card-body">
+      <h6><%= alert.alert_type.humanize %></h6>
+      <p class="card-text"><%= alert.message %></p>
+      <div class="d-flex justify-content-between align-items-center">
+        <small class="text-muted">
+          <%= time_ago_in_words(alert.created_at) %> ago
+        </small>
+        <%= link_to "View Alert", environmental_alert_path(alert), class: "btn btn-sm btn-outline-primary" %>
+      </div>
+    </div>
+  </div>
+<% else %>
+  <div class="card border-success">
+    <div class="card-header bg-success bg-opacity-10">
+      <h5 class="mb-0">
+        <i class="bi bi-check-circle text-success"></i>
+        No Active Alerts
+      </h5>
+    </div>
+    <div class="card-body">
+      <p class="text-muted mb-0">This sensor is operating normally.</p>
+    </div>
+  </div>
+<% end %>

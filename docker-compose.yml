@@ -5,7 +5,7 @@ name: weatherforge
 
 services:
   postgres:
-    image: postgres:17-alpine
+    image: postgis/postgis:17-3.5
     container_name: weatherforge_postgres
     environment:
       POSTGRES_USER: weatherforge
@@ -16,8 +16,10 @@ services:
       - "5432:5432"
     volumes:
       - postgres_data:/var/lib/postgresql/data
+      - ./db/init.sql:/docker-entrypoint-initdb.d/init.sql
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U weatherforge"]
+      test:
+        ["CMD-SHELL", "pg_isready -U weatherforge -d weatherforge_development"]
       interval: 10s
       timeout: 5s
       retries: 5
@@ -47,10 +49,12 @@ services:
   web:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
       args:
         RUBY_VERSION: 3.4.5
         NODE_VERSION: 22.12.0
+        USER_ID: ${USER_ID:-1000}
+        GROUP_ID: ${GROUP_ID:-1000}
     container_name: weatherforge_web
     command: bash -c "rm -f tmp/pids/server.pid && bin/rails db:prepare && bin/rails server -b 0.0.0.0"
     environment:
@@ -58,12 +62,16 @@ services:
       DATABASE_URL: postgresql://weatherforge:${POSTGRES_PASSWORD:-weatherforge_dev_password}@postgres:5432/weatherforge_development
       REDIS_URL: redis://redis:6379/0
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+      RAILS_LOG_TO_STDOUT: "true"
     ports:
       - "3000:3000"
     volumes:
-      - .:/rails
+      - .:/rails:cached
       - bundle_cache:/usr/local/bundle
       - node_modules:/rails/node_modules
+      - rails_tmp:/rails/tmp
+      - rails_log:/rails/log
+      - rails_storage:/rails/storage
     depends_on:
       postgres:
         condition: service_healthy
@@ -74,24 +82,30 @@ services:
       - weatherforge_network
     stdin_open: true
     tty: true
+    user: "${USER_ID:-1000}:${GROUP_ID:-1000}"
 
   sidekiq:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.dev
       args:
         RUBY_VERSION: 3.4.5
         NODE_VERSION: 22.12.0
+        USER_ID: ${USER_ID:-1000}
+        GROUP_ID: ${GROUP_ID:-1000}
     container_name: weatherforge_sidekiq
-    command: bundle exec sidekiq -C config/sidekiq.yml
+    command: bash -c "sleep 5 && bundle exec sidekiq -C config/sidekiq.yml"
     environment:
       RAILS_ENV: ${RAILS_ENV:-development}
       DATABASE_URL: postgresql://weatherforge:${POSTGRES_PASSWORD:-weatherforge_dev_password}@postgres:5432/weatherforge_development
       REDIS_URL: redis://redis:6379/0
       RAILS_MASTER_KEY: ${RAILS_MASTER_KEY}
+      RAILS_LOG_TO_STDOUT: "true"
     volumes:
-      - .:/rails
+      - .:/rails:cached
       - bundle_cache:/usr/local/bundle
+      - rails_tmp:/rails/tmp
+      - rails_log:/rails/log
     depends_on:
       postgres:
         condition: service_healthy
@@ -102,6 +116,7 @@ services:
     restart: unless-stopped
     networks:
       - weatherforge_network
+    user: "${USER_ID:-1000}:${GROUP_ID:-1000}"
 
 volumes:
   postgres_data:
@@ -111,6 +126,12 @@ volumes:
   bundle_cache:
     driver: local
   node_modules:
+    driver: local
+  rails_tmp:
+    driver: local
+  rails_log:
+    driver: local
+  rails_storage:
     driver: local
 
 networks:
